@@ -10,3 +10,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 Route::post('/send-otp', [AuthController::class, 'sendOtp']);
 Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/add-shop', [AuthController::class, 'addShop']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});

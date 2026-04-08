@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Shop;
+use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles;
     /**
      * The attributes that are mass assignable.
      *
@@ -40,10 +42,11 @@ class User extends Authenticatable
         ];
     }
 
-    public function fetchCustomerData($request, $columns) {
-        $query =User::where('id', '!=', '');
-        if(isset($request->customer_id)){
-            $query->whereIn("id",$request->customer_id);
+    public function fetchCustomerData($request, $columns)
+    {
+        $query = User::where('id', '!=', '');
+        if (isset($request->customer_id)) {
+            $query->whereIn("id", $request->customer_id);
         }
         if (isset($request->from_date)) {
             $query->whereRaw('DATE_FORMAT(created_at, "%Y-%m-%d") >= "' . date("Y-m-d", strtotime($request->from_date)) . '"');
@@ -56,9 +59,9 @@ class User extends Authenticatable
 
             $query->where(function ($q) use ($searchValue) {
                 $q->where('first_name', 'like', '%' . $searchValue . '%')
-                  ->orWhere('last_name', 'like', '%' . $searchValue . '%')
-                  ->orWhere('email', 'like', '%' . $searchValue . '%')
-                  ->orWhere('phone_no', 'like', '%' . $searchValue . '%');
+                    ->orWhere('last_name', 'like', '%' . $searchValue . '%')
+                    ->orWhere('email', 'like', '%' . $searchValue . '%')
+                    ->orWhere('phone_no', 'like', '%' . $searchValue . '%');
             });
         }
 
@@ -68,5 +71,9 @@ class User extends Authenticatable
             $customers = $query->orderBy('created_at', 'desc');
         }
         return $customers;
+    }
+    public function shops()
+    {
+        return $this->hasMany(Shop::class, 'user_id');
     }
 }
