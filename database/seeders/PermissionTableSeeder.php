@@ -19,7 +19,8 @@ class PermissionTableSeeder extends Seeder
            'Main-Category-Management',
            'Category-Management',
            'Sub-Category-Management',
-           'Customer-Management'
+           'Customer-Management',
+           'Shop-Management'
         ];
 
         foreach ($permissions as $permission) {

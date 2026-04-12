@@ -70,6 +70,14 @@
                         </a>
                     </li>
                 @endcan
+                @can('Shop-Management')
+                    <li class="nxl-item nxl-hasmenu {{ request()->is('admin/user-shops/*') ? 'active' : '' }}">
+                        <a href="{{ route('user-shops.index') }}" class="nxl-link">
+                            <span class="nxl-micon"><i class="feather-shopping-bag"></i></span>
+                            <span class="nxl-mtext">User Shop Management</span>
+                        </a>
+                    </li>
+                @endcan
                 {{-- @can('Main-Category-Management')
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('main-categories.index') }} {{ request()->is('main-categories/*') ? 'active' : '' }}"

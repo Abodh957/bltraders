@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\MainCategoryController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubCategoryController;
+use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\ProductController;
 use App\Models\MainCategory;
 Route::get('/', function () {
@@ -48,6 +49,11 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('sub-categories', SubCategoryController::class);
     Route::post('sub-categories/data', [SubCategoryController::class, 'getData'])->name('subCategories.data');
     Route::post('sub-categories/statusChange', [SubCategoryController::class, 'statusChange'])->name('subCategories.statusChange');
+
+    //User Shops
+    Route::resource('user-shops', ShopController::class);
+    Route::post('user-shops/data', [ShopController::class, 'getData'])->name('user-shops.data');
+    Route::post('user-shops/statusChange', [ShopController::class, 'statusChange'])->name('user-shops.statusChange');
 });
 
 require __DIR__.'/auth.php';
