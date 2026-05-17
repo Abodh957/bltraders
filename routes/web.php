@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\ProductController;
 use App\Models\MainCategory;
+
 Route::get('/', function () {
     return view('welcome');
 });
