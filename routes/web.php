@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\MainCategoryController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\ShopController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\ProductController;
 use App\Models\MainCategory;
 
@@ -55,6 +57,18 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('user-shops', ShopController::class);
     Route::post('user-shops/data', [ShopController::class, 'getData'])->name('user-shops.data');
     Route::post('user-shops/statusChange', [ShopController::class, 'statusChange'])->name('user-shops.statusChange');
+
+    //Banners
+    Route::resource('banners', BannerController::class);
+    Route::post('banners/data', [BannerController::class, 'getData'])->name('banners.data');
+    Route::post('banners/statusChange', [BannerController::class, 'statusChange'])->name('banners.statusChange');
+    Route::post('banners/bulk-delete', [BannerController::class, 'bulkDelete'])->name('banners.bulkDelete');
+
+    //Brands
+    Route::resource('brands', BrandController::class);
+    Route::post('brands/data', [BrandController::class, 'getData'])->name('brands.data');
+    Route::post('brands/statusChange', [BrandController::class, 'statusChange'])->name('brands.statusChange');
+    Route::post('brands/bulk-delete', [BrandController::class, 'bulkDelete'])->name('brands.bulkDelete');
 });
 
 require __DIR__.'/auth.php';

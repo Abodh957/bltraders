@@ -78,6 +78,18 @@
                         </a>
                     </li>
                 @endcan
+                <li class="nxl-item nxl-hasmenu {{ request()->is('admin/banners*') ? 'active' : '' }}">
+                    <a href="{{ route('banners.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-image"></i></span>
+                        <span class="nxl-mtext">Banner Management</span>
+                    </a>
+                </li>
+                <li class="nxl-item nxl-hasmenu {{ request()->is('admin/brands*') ? 'active' : '' }}">
+                    <a href="{{ route('brands.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-tag"></i></span>
+                        <span class="nxl-mtext">Brand Management</span>
+                    </a>
+                </li>
                 {{-- @can('Main-Category-Management')
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('main-categories.index') }} {{ request()->is('main-categories/*') ? 'active' : '' }}"
