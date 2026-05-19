@@ -6,15 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Category extends Model
+class Store extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
-    public function store()
+    public function categories()
     {
-        return $this->belongsTo(Store::class);
+        return $this->hasMany(Category::class);
     }
 
     public function subCategories()
@@ -24,7 +24,7 @@ class Category extends Model
 
     public function fetchData($request, $columns)
     {
-        $query = Category::with('store')->where('id', '!=', '');
+        $query = Store::where('id', '!=', '');
 
         if (isset($request->from_date)) {
             $query->whereRaw('DATE_FORMAT(created_at, "%Y-%m-%d") >= "' . date("Y-m-d", strtotime($request->from_date)) . '"');
@@ -35,7 +35,8 @@ class Category extends Model
         if (isset($request['search']['value']) && !empty($request['search']['value'])) {
             $searchValue = $request['search']['value'];
             $query->where(function ($q) use ($searchValue) {
-                $q->where('name', 'like', '%' . $searchValue . '%');
+                $q->where('name', 'like', '%' . $searchValue . '%')
+                  ->orWhere('slug', 'like', '%' . $searchValue . '%');
             });
         }
 

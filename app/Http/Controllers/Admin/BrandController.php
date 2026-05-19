@@ -122,7 +122,7 @@ class BrandController extends Controller
         $this->deleteFile($this->logoPath,  $brand->logo);
         $this->deleteFile($this->coverPath, $brand->cover_image);
         $brand->delete();
-        return redirect()->route('brands.index')->with('success', 'Brand deleted successfully.');
+        return response()->json(['success' => true, 'message' => 'Brand deleted successfully.']);
     }
 
     public function bulkDelete(Request $request)
@@ -156,7 +156,7 @@ class BrandController extends Controller
         $i = 1;
         foreach ($brands as $value) {
             $logoHtml = $value->logo
-                ? "<img src='/" . $this->logoPath . $value->logo . "' style='width:50px;height:50px;object-fit:contain;border-radius:4px;' />"
+                ? "<img src='" . config('custom.public_path') . '/' . $this->logoPath . $value->logo . "' style='width:50px;height:50px;object-fit:contain;border-radius:4px;' />"
                 : '<span class="text-muted">-</span>';
 
             $action  = '<div class="hstack gap-2 justify-content-end">';

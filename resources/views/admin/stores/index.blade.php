@@ -6,23 +6,21 @@
         <div class="page-header">
             <div class="page-header-left d-flex align-items-center">
                 <div class="page-header-title">
-                    <h5 class="m-b-10">Banners</h5>
+                    <h5 class="m-b-10">Stores</h5>
                 </div>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Banners</li>
+                    <li class="breadcrumb-item">Stores</li>
                 </ul>
             </div>
             <div class="page-header-right ms-auto">
                 <div class="page-header-right-items">
                     <div class="d-flex align-items-center gap-2 page-header-right-items-wrapper">
                         <button type="button" id="bulkDeleteBtn" class="btn btn-danger d-none">
-                            <i class="feather-trash-2 me-2"></i>
-                            <span>Delete Selected</span>
+                            <i class="feather-trash-2 me-2"></i>Delete Selected
                         </button>
-                        <a href="{{ route('banners.create') }}" class="btn btn-primary">
-                            <i class="feather-plus me-2"></i>
-                            <span>Add Banner</span>
+                        <a href="{{ route('stores.create') }}" class="btn btn-primary">
+                            <i class="feather-plus me-2"></i>Add Store
                         </a>
                     </div>
                 </div>
@@ -35,15 +33,13 @@
                     <div class="card stretch stretch-full">
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover" id="BannersTable" data-url="{{ route('banners.data') }}">
+                                <table class="table table-hover" id="StoresTable" data-url="{{ route('stores.data') }}">
                                     <thead>
                                         <tr>
                                             <th><input type="checkbox" id="selectAll"></th>
                                             <th>Sr.</th>
-                                            <th>Image</th>
-                                            <th>Title</th>
-                                            <th>Heading</th>
-                                            <th>Order</th>
+                                            <th>Name</th>
+                                            <th>Slug</th>
                                             <th>Status</th>
                                             <th>Date</th>
                                             <th class="text-end">Actions</th>
@@ -64,65 +60,46 @@
         $(document).ready(function () {
             $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
-            var table = $('#BannersTable').DataTable({
+            var table = $('#StoresTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: {
-                    url: $('#BannersTable').data('url'),
-                    type: 'POST',
-                },
+                ajax: { url: $('#StoresTable').data('url'), type: 'POST' },
                 paging: true,
                 pageLength: 10,
                 lengthChange: false,
                 searching: true,
                 columns: [
-                    { data: 'checkbox',   name: 'checkbox',   orderable: false, searchable: false },
-                    { data: 'srno',       name: 'id',         orderable: false, searchable: false },
-                    { data: 'image',      name: 'image',      orderable: false, searchable: false },
-                    { data: 'title',      name: 'title' },
-                    { data: 'heading',    name: 'heading' },
-                    { data: 'order',      name: 'order' },
+                    { data: 'checkbox',   orderable: false, searchable: false },
+                    { data: 'srno',       orderable: false, searchable: false },
+                    { data: 'name',       name: 'name' },
+                    { data: 'slug',       name: 'slug' },
                     { data: 'status',     name: 'status' },
                     { data: 'created_at', name: 'created_at' },
-                    { data: 'actions',    name: 'actions',    orderable: false, searchable: false }
+                    { data: 'actions',    orderable: false, searchable: false }
                 ]
             });
 
-            // Select all
             $('#selectAll').on('change', function () {
                 $('.row-checkbox').prop('checked', this.checked);
                 toggleBulkDelete();
             });
 
-            $(document).on('change', '.row-checkbox', function () {
-                toggleBulkDelete();
-            });
+            $(document).on('change', '.row-checkbox', toggleBulkDelete);
 
             function toggleBulkDelete() {
-                var checked = $('.row-checkbox:checked').length;
-                $('#bulkDeleteBtn').toggleClass('d-none', checked === 0);
+                $('#bulkDeleteBtn').toggleClass('d-none', $('.row-checkbox:checked').length === 0);
             }
 
             function showToast(icon, title) {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    icon: icon,
-                    title: title
-                });
+                Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: icon, title: title });
             }
 
-            // Bulk delete
             $('#bulkDeleteBtn').on('click', function () {
                 var ids = $('.row-checkbox:checked').map(function () { return $(this).val(); }).get();
                 if (!ids.length) return;
-                if (!confirm('Are you sure you want to delete ' + ids.length + ' banner(s)?')) return;
-
+                if (!confirm('Delete ' + ids.length + ' selected store(s)?')) return;
                 $.ajax({
-                    url: '{{ route("banners.bulkDelete") }}',
+                    url: '{{ route("stores.bulkDelete") }}',
                     type: 'POST',
                     data: { ids: ids },
                     success: function (res) {
@@ -130,42 +107,37 @@
                             table.ajax.reload(null, false);
                             $('#selectAll').prop('checked', false);
                             $('#bulkDeleteBtn').addClass('d-none');
-                            showToast('success', res.message || 'Selected banners deleted successfully.');
+                            showToast('success', res.message);
                         }
                     },
                     error: function () { showToast('error', 'Failed to delete. Please try again.'); }
                 });
             });
 
-            // Single delete
             $(document).on('click', '.delete-btn', function () {
                 var id = $(this).data('id');
-                if (!confirm('Are you sure you want to delete this banner?')) return;
-
+                if (!confirm('Are you sure you want to delete this store?')) return;
                 $.ajax({
-                    url: '{{ url("admin/banners") }}/' + id,
+                    url: '{{ url("admin/stores") }}/' + id,
                     type: 'POST',
                     data: { _method: 'DELETE' },
                     success: function (res) {
                         if (res.success) {
                             table.ajax.reload(null, false);
-                            showToast('success', res.message || 'Banner deleted successfully.');
+                            showToast('success', res.message);
                         }
                     },
                     error: function () { showToast('error', 'Failed to delete. Please try again.'); }
                 });
             });
 
-            // Status toggle
             $(document).on('change', '.statusChange', function () {
-                var id = $(this).data('id');
-                var status = this.checked ? 1 : 0;
                 $.ajax({
-                    url: '{{ route("banners.statusChange") }}',
+                    url: '{{ route("stores.statusChange") }}',
                     type: 'POST',
-                    data: { id: id, status: status },
+                    data: { id: $(this).data('id'), status: this.checked ? 1 : 0 },
                     success: function () { table.ajax.reload(null, false); },
-                    error: function () { alert('Failed to update status. Please try again.'); }
+                    error: function () { showToast('error', 'Failed to update status.'); }
                 });
             });
         });

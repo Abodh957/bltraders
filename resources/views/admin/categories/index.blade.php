@@ -3,7 +3,6 @@
 @section('content')
 <main class="nxl-container">
     <div class="nxl-content">
-        <!-- [ page-header ] start -->
         <div class="page-header">
             <div class="page-header-left d-flex align-items-center">
                 <div class="page-header-title">
@@ -16,29 +15,18 @@
             </div>
             <div class="page-header-right ms-auto">
                 <div class="page-header-right-items">
-                    <div class="d-flex d-md-none">
-                        <a href="{{ route('categories.index') }}" class="page-header-right-close-toggle">
-                            <i class="feather-arrow-left me-2"></i>
-                            <span>Back</span>
-                        </a>
-                    </div>
                     <div class="d-flex align-items-center gap-2 page-header-right-items-wrapper">
+                        <button type="button" id="bulkDeleteBtn" class="btn btn-danger d-none">
+                            <i class="feather-trash-2 me-2"></i>Delete Selected
+                        </button>
                         <a href="{{ route('categories.create') }}" class="btn btn-primary">
-                            <i class="feather-plus me-2"></i>
-                            <span>Create Categories</span>
+                            <i class="feather-plus me-2"></i>Add Category
                         </a>
                     </div>
-                </div>
-                <div class="d-md-none d-flex align-items-center">
-                    <a href="javascript:void(0)" class="page-header-right-open-toggle">
-                        <i class="feather-align-right fs-20"></i>
-                    </a>
                 </div>
             </div>
         </div>
-        <!-- [ page-header ] end -->
 
-        <!-- [ Main Content ] start -->
         <div class="main-content">
             <div class="row">
                 <div class="col-lg-12">
@@ -48,18 +36,18 @@
                                 <table class="table table-hover" id="CategoriesTable" data-url="{{ route('categories.data') }}">
                                     <thead>
                                         <tr>
-                                            <th>Srno</th>
+                                            <th><input type="checkbox" id="selectAll"></th>
+                                            <th>Sr.</th>
+                                            <th>Image</th>
                                             <th>Name</th>
-                                            <Th>Image</Th>
-                                            <Th>Description</Th>
+                                            <th>Store</th>
+                                            <th>Description</th>
                                             <th>Status</th>
                                             <th>Date</th>
                                             <th class="text-end">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <!-- Dynamic rows will be loaded here by DataTable -->
-                                    </tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
@@ -67,76 +55,98 @@
                 </div>
             </div>
         </div>
-        <!-- [ Main Content ] end -->
     </div>
 
     @push('script')
     <script>
-        $(document).ready(function() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+        $(document).ready(function () {
+            $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
-            $('#CategoriesTable').DataTable({
+            var table = $('#CategoriesTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: {
-                    url: $('#CategoriesTable').data('url'),
-                    type: 'POST',
-                    data: function(d) {
-                        // Add CSRF token and additional data
-                        d.from_date = $('input[name=from_date]').val();
-                        d.end_date = $('input[name=end_date]').val();
-                    },
-                    dataSrc: 'data' // Adjust based on your server response structure
-                },
+                ajax: { url: $('#CategoriesTable').data('url'), type: 'POST' },
                 paging: true,
-                pageLength: 5,
+                pageLength: 10,
                 lengthChange: false,
                 searching: true,
                 columns: [
-                    { data: 'srno', name: 'id', orderable: false, searchable: false },
-                    { data: 'name', name: 'name' },
-                    { data: 'image', name: 'image' },
-                    { data: 'description', name: 'description' },
-                    { data: 'status', name: 'status' },
-                    { data: 'created_at', name: 'created_at' },
-                    { data: 'actions', name: 'actions', orderable: false, searchable: false }
+                    { data: 'checkbox',    orderable: false, searchable: false },
+                    { data: 'srno',        orderable: false, searchable: false },
+                    { data: 'image',       orderable: false, searchable: false },
+                    { data: 'name',        name: 'name' },
+                    { data: 'store',       orderable: false, searchable: false },
+                    { data: 'description', orderable: false, searchable: false },
+                    { data: 'status',      name: 'status' },
+                    { data: 'created_at',  name: 'created_at' },
+                    { data: 'actions',     orderable: false, searchable: false }
                 ]
             });
 
-            // Status change event
-            $(document).on("change", ".statusChange", function() {
-                var dataurl = $(this).data("url");
-                var id = $(this).data('id');
-              //  var newStatus = $(this).val();
-                var newStatus = this.checked ? 1 : 0;
+            $('#selectAll').on('change', function () {
+                $('.row-checkbox').prop('checked', this.checked);
+                toggleBulkDelete();
+            });
+            $(document).on('change', '.row-checkbox', toggleBulkDelete);
+
+            function toggleBulkDelete() {
+                $('#bulkDeleteBtn').toggleClass('d-none', $('.row-checkbox:checked').length === 0);
+            }
+
+            function showToast(icon, title) {
+                Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: icon, title: title });
+            }
+
+            $('#bulkDeleteBtn').on('click', function () {
+                var ids = $('.row-checkbox:checked').map(function () { return $(this).val(); }).get();
+                if (!ids.length) return;
+                if (!confirm('Delete ' + ids.length + ' selected category(s)?')) return;
                 $.ajax({
-                    url: dataurl,
+                    url: '{{ route("categories.bulkDelete") }}',
                     type: 'POST',
-                    data: {
-                        id:id,
-                        status: newStatus
+                    data: { ids: ids },
+                    success: function (res) {
+                        if (res.success) {
+                            table.ajax.reload(null, false);
+                            $('#selectAll').prop('checked', false);
+                            $('#bulkDeleteBtn').addClass('d-none');
+                            showToast('success', res.message);
+                        }
                     },
-                    success: function(response) {
-                        // Handle success response
-                        $('#CategoriesTable').DataTable().ajax.reload(null, false); // Reload the table without resetting the pagination
+                    error: function () { showToast('error', 'Failed to delete. Please try again.'); }
+                });
+            });
+
+            $(document).on('click', '.delete-btn', function () {
+                var id = $(this).data('id');
+                if (!confirm('Are you sure you want to delete this category?')) return;
+                $.ajax({
+                    url: '{{ url("admin/categories") }}/' + id,
+                    type: 'POST',
+                    data: { _method: 'DELETE' },
+                    success: function (res) {
+                        if (res.success) {
+                            table.ajax.reload(null, false);
+                            showToast('success', res.message);
+                        }
                     },
-                    error: function(xhr, status, error) {
-                        // Handle error response
-                        alert("Failed to update status. Please try again.");
-                    }
+                    error: function () { showToast('error', 'Failed to delete. Please try again.'); }
+                });
+            });
+
+            $(document).on('change', '.statusChange', function () {
+                $.ajax({
+                    url: '{{ route("categories.statusChange") }}',
+                    type: 'POST',
+                    data: { id: $(this).data('id'), status: this.checked ? 1 : 0 },
+                    success: function () { table.ajax.reload(null, false); },
+                    error: function () { showToast('error', 'Failed to update status.'); }
                 });
             });
         });
     </script>
-
     @endpush
 
-    <!-- [ Footer ] start -->
-    <!-- [ Footer ] end -->
     @include('admin.layouts.footer')
 </main>
 @endsection

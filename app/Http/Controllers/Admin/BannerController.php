@@ -119,7 +119,7 @@ class BannerController extends Controller
             unlink($uploadPath . '/' . $banner->image);
         }
         $banner->delete();
-        return redirect()->route('banners.index')->with('success', 'Banner deleted successfully.');
+        return response()->json(['success' => true, 'message' => 'Banner deleted successfully.']);
     }
 
     public function bulkDelete(Request $request)
@@ -165,7 +165,7 @@ class BannerController extends Controller
             $data['title']    = ucfirst($value->title);
             $data['heading']  = $value->heading ?? '-';
             $data['order']    = $value->order;
-            $data['image']    = "<img class='avatar-image avatar-md bg-warning text-white' src='/" . $this->uploadPath . $value->image . "' style='width:60px;height:40px;object-fit:cover;border-radius:4px;'/>";
+            $data['image']    = "<img class='avatar-image avatar-md bg-warning text-white' src='" . config('custom.public_path') . '/' . $this->uploadPath . $value->image . "' style='width:60px;height:40px;object-fit:cover;border-radius:4px;'/>";
             $data['status']   = isActiveInactive($value->status, route('banners.statusChange'), $value->id);
             $data['created_at'] = dateFormat($value->created_at);
 

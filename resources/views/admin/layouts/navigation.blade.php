@@ -117,26 +117,24 @@
                 @endcan
                 --}}
                 <li
-                    class="nxl-item nxl-hasmenu nxl-trigger {{ (request()->is('main-categories/*') || request()->is('another-category/*') || request()->is('some-route')) ? 'active' : '' }}">
+                    class="nxl-item nxl-hasmenu nxl-trigger {{ (request()->is('admin/stores*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*')) ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-airplay"></i></span>
                         <span class="nxl-mtext">Category Management</span><span class="nxl-arrow"><i
                                 class="feather-chevron-right"></i></span>
                     </a>
                     <ul class="nxl-submenu"
-                        style="display: {{ (request()->is('admin/main-categories*') || request()->is('admin/categories*') || request()->is('admin/sub-categories&*')) ? 'block' : 'none' }};">
-                        @can('Main-Category-Management')
-                            <li class="nxl-item {{ request()->is('main-categories/*') ? 'active' : '' }}">
-                                <a class="nxl-link" href="{{ route('main-categories.index') }}">Main Categories</a>
-                            </li>
-                        @endcan
+                        style="display: {{ (request()->is('admin/stores*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*')) ? 'block' : 'none' }};">
+                        <li class="nxl-item {{ request()->is('admin/stores*') ? 'active' : '' }}">
+                            <a class="nxl-link" href="{{ route('stores.index') }}">Stores</a>
+                        </li>
                         @can('Category-Management')
-                            <li class="nxl-item {{ request()->is('admin/categories/*') ? 'active' : '' }}">
+                            <li class="nxl-item {{ request()->is('admin/categories*') ? 'active' : '' }}">
                                 <a class="nxl-link" href="{{ route('categories.index') }}">Categories</a>
                             </li>
                         @endcan
                         @can('Sub-Category-Management')
-                            <li class="nxl-item {{ request()->is('main-categories/*') ? 'active' : '' }}">
+                            <li class="nxl-item {{ request()->is('admin/sub-categories*') ? 'active' : '' }}">
                                 <a class="nxl-link" href="{{ route('sub-categories.index') }}">Sub Categories</a>
                             </li>
                         @endcan

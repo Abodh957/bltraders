@@ -138,7 +138,7 @@ class BannerController extends Controller
             'id'         => $banner->id,
             'title'      => $banner->title,
             'heading'    => $banner->heading,
-            'image'      => url($this->uploadPath . $banner->image),
+            'image'      => url('public/' . $this->uploadPath . $banner->image),
             'order'      => $banner->order,
             'status'     => $banner->status,
             'created_at' => $banner->created_at,

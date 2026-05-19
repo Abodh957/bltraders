@@ -96,6 +96,18 @@
                 $('#bulkDeleteBtn').toggleClass('d-none', $('.row-checkbox:checked').length === 0);
             }
 
+            function showToast(icon, title) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    icon: icon,
+                    title: title
+                });
+            }
+
             $('#bulkDeleteBtn').on('click', function () {
                 var ids = $('.row-checkbox:checked').map(function () { return $(this).val(); }).get();
                 if (!ids.length) return;
@@ -109,9 +121,10 @@
                             table.ajax.reload(null, false);
                             $('#selectAll').prop('checked', false);
                             $('#bulkDeleteBtn').addClass('d-none');
+                            showToast('success', res.message || 'Selected brands deleted successfully.');
                         }
                     },
-                    error: function () { alert('Failed to delete. Please try again.'); }
+                    error: function () { showToast('error', 'Failed to delete. Please try again.'); }
                 });
             });
 
@@ -119,11 +132,16 @@
                 var id = $(this).data('id');
                 if (!confirm('Are you sure you want to delete this brand?')) return;
                 $.ajax({
-                    url: '/admin/brands/' + id,
+                    url: '{{ url("admin/brands") }}/' + id,
                     type: 'POST',
                     data: { _method: 'DELETE' },
-                    success: function () { table.ajax.reload(null, false); },
-                    error: function () { alert('Failed to delete. Please try again.'); }
+                    success: function (res) {
+                        if (res.success) {
+                            table.ajax.reload(null, false);
+                            showToast('success', res.message || 'Brand deleted successfully.');
+                        }
+                    },
+                    error: function () { showToast('error', 'Failed to delete. Please try again.'); }
                 });
             });
 
