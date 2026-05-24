@@ -70,24 +70,6 @@
                                     </div>
 
                                 </div>
-                                <div class="row mb-34">
-                                    <div class="col-lg-4" data-select2-id="select2-data-91-82j8">
-                                        <label class="form-label">Select Role</label>
-
-                                        <select class="form-control select2-hidden-accessible" required data-select2-selector="city" data-select2-id="select2-data-70-8hue" tabindex="-1" name="role_id" aria-hidden="true">
-                                            <option  value="" >Select Role</option>
-                                            @if(isset($roles) && count($roles) > 0)
-                                            @foreach ($roles as $row)
-                                            @php
-                                            $formattedName = ucwords(str_replace('-', ' ', $row->name));
-                                            @endphp
-                                            <option  value="{{ $row->id }}" >{{ $formattedName }}</option>
-                                            @endforeach
-                                            @endif
-                                        </select>
-                                    </div>
-
-                                </div>
 
 
                                 <div class="row row mt-4">

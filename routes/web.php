@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ColorController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -72,6 +74,22 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::post('brands/data', [BrandController::class, 'getData'])->name('brands.data');
     Route::post('brands/statusChange', [BrandController::class, 'statusChange'])->name('brands.statusChange');
     Route::post('brands/bulk-delete', [BrandController::class, 'bulkDelete'])->name('brands.bulkDelete');
+
+    //Colors
+    Route::post('colors/data', [ColorController::class, 'getData'])->name('colors.data');
+    Route::post('colors/statusChange', [ColorController::class, 'statusChange'])->name('colors.statusChange');
+    Route::post('colors/bulk-delete', [ColorController::class, 'bulkDelete'])->name('colors.bulkDelete');
+    Route::resource('colors', ColorController::class);
+
+    //Products — specific routes MUST come before resource to avoid {product} wildcard catching them
+    Route::post('products/data', [ProductController::class, 'getData'])->name('products.data');
+    Route::post('products/statusChange', [ProductController::class, 'statusChange'])->name('products.statusChange');
+    Route::post('products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulkDelete');
+    Route::post('products/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
+    Route::post('products/set-primary-image', [ProductController::class, 'setPrimaryImage'])->name('products.setPrimaryImage');
+    Route::get('products/categories', [ProductController::class, 'getCategories'])->name('products.categories');
+    Route::get('products/sub-categories', [ProductController::class, 'getSubCategories'])->name('products.subCategories');
+    Route::resource('products', ProductController::class);
 });
 
 require __DIR__.'/auth.php';

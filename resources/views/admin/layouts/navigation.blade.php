@@ -90,6 +90,18 @@
                         <span class="nxl-mtext">Brand Management</span>
                     </a>
                 </li>
+                <li class="nxl-item nxl-hasmenu {{ request()->is('admin/products*') ? 'active' : '' }}">
+                    <a href="{{ route('products.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-box"></i></span>
+                        <span class="nxl-mtext">Product Management</span>
+                    </a>
+                </li>
+                <li class="nxl-item nxl-hasmenu {{ request()->is('admin/colors*') ? 'active' : '' }}">
+                    <a href="{{ route('colors.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-droplet"></i></span>
+                        <span class="nxl-mtext">Color Management</span>
+                    </a>
+                </li>
                 {{-- @can('Main-Category-Management')
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('main-categories.index') }} {{ request()->is('main-categories/*') ? 'active' : '' }}"

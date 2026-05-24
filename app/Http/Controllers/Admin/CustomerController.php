@@ -39,8 +39,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        $roles = Role::where("id","<>",1)->get();
-        return view('admin.customers.create',compact('roles'));
+        return view('admin.customers.create');
     }
 
     /**
@@ -55,22 +54,16 @@ class CustomerController extends Controller
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email',
-                'phone_no' => 'required|numeric|digits:10', // Ensures only numeric characters are allowed
-                'password' => 'required|string|min:8|confirmed', // 'confirmed' handles password confirmation
-                'password.confirmed' => 'The password confirmation does not match.',
-                'role_id' => 'required',
+                'phone_no' => 'required|numeric|digits:10',
+                'password' => 'required|string|min:8|confirmed',
             ]);
 
             // Hash the password
             $validated['password'] = Hash::make($validated['password']);
-            unset($validated['roles']);
-            // Create a new user
-           $user= User::create($validated);
+            $user = User::create($validated);
 
-           $roles = Role::where("id",$request->role_id)->first();
-
-           // Assign roles
-           $user->assignRole($roles->name);
+            // Assign default user role
+            $user->assignRole('user');
 
 
             // Redirect back with success message

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\ProductController;
 
 
 Route::get('/user', function (Request $request) {
@@ -76,3 +77,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/sub-categories/{id}', [SubCategoryController::class, 'update']);
     Route::delete('/sub-categories/{id}', [SubCategoryController::class, 'destroy']);
 });
+
+// Product API (public)
+// GET /api/products                          — list (paginated)
+// GET /api/products?store_id=1               — filter by store
+// GET /api/products?category_id=1            — filter by category
+// GET /api/products?sub_category_id=1        — filter by sub-category
+// GET /api/products?search=yoga              — search by name/sku
+// GET /api/products?featured=1              — featured only
+// GET /api/products?per_page=10&page=2       — pagination
+// GET /api/products/{id}                     — single product detail
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
