@@ -128,15 +128,18 @@
                 </li>
                 @endcan
                 --}}
-                <li
-                    class="nxl-item nxl-hasmenu nxl-trigger {{ (request()->is('admin/stores*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*')) ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="nxl-link">
-                        <span class="nxl-micon"><i class="feather-airplay"></i></span>
-                        <span class="nxl-mtext">Category Management</span><span class="nxl-arrow"><i
-                                class="feather-chevron-right"></i></span>
+                @php
+                    $catMenuOpen = request()->is('admin/stores*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*');
+                @endphp
+                <li id="catMgmtMenu" class="nxl-item nxl-hasmenu {{ $catMenuOpen ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="nxl-link" id="catMgmtToggle">
+                        <span class="nxl-micon"><i class="feather-layers"></i></span>
+                        <span class="nxl-mtext">Category Management</span>
+                        <span class="nxl-arrow">
+                            <i id="catMgmtIcon" class="{{ $catMenuOpen ? 'feather-chevron-down' : 'feather-chevron-right' }}"></i>
+                        </span>
                     </a>
-                    <ul class="nxl-submenu"
-                        style="display: {{ (request()->is('admin/stores*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*')) ? 'block' : 'none' }};">
+                    <ul class="nxl-submenu" id="catMgmtSubmenu" style="display:{{ $catMenuOpen ? 'block' : 'none' }};">
                         <li class="nxl-item {{ request()->is('admin/stores*') ? 'active' : '' }}">
                             <a class="nxl-link" href="{{ route('stores.index') }}">Stores</a>
                         </li>
@@ -152,6 +155,21 @@
                         @endcan
                     </ul>
                 </li>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var toggle   = document.getElementById('catMgmtToggle');
+                        var submenu  = document.getElementById('catMgmtSubmenu');
+                        var icon     = document.getElementById('catMgmtIcon');
+
+                        toggle.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            var isOpen = submenu.style.display === 'block';
+                            submenu.style.display = isOpen ? 'none' : 'block';
+                            icon.className = isOpen ? 'feather-chevron-right' : 'feather-chevron-down';
+                        });
+                    });
+                </script>
             </ul>
         </div>
     </div>
