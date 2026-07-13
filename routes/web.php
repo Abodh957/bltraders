@@ -39,6 +39,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     //Customer
     Route::resource('customers', CustomerController::class);
     Route::post('customers/data', [CustomerController::class, 'getData'])->name('customers.data');
+    Route::post('customers/statusChange', [CustomerController::class, 'statusChange'])->name('customers.statusChange');
 
     //Stores
     Route::resource('stores', StoreController::class);

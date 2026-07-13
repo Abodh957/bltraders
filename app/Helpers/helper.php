@@ -127,6 +127,47 @@ if (!function_exists('isActiveInactive')) {
             <option value="1" '.($status == '1' ? 'selected' : '').'>Active</option>
             <option value="0" '.($status == '0' ? 'selected' : '').'>Inactive</option>
         </select> */
+if (!function_exists('shopStatusSelect')) {
+    // Shop status is a 3-state enum (pending/approved/rejected), so a toggle can't represent it.
+    function shopStatusSelect($status, $route, $shopId) {
+        if (empty($shopId)) {
+            return '<span class="badge bg-soft-dark text-dark"><i class="feather feather-slash me-1"></i>No Shop</span>';
+        }
+
+        $states = [
+            'pending'  => ['label' => 'Pending',  'color' => 'warning', 'icon' => 'feather-clock'],
+            'approved' => ['label' => 'Approved', 'color' => 'success', 'icon' => 'feather-check-circle'],
+            'rejected' => ['label' => 'Rejected', 'color' => 'danger',  'icon' => 'feather-x-circle'],
+        ];
+        $current = $states[$status] ?? $states['pending'];
+
+        $items = '';
+        foreach ($states as $value => $state) {
+            if ($value === $status) {
+                continue;
+            }
+            $items .= '<li>
+                <a class="dropdown-item c-pointer shopStatusChange" href="javascript:void(0)"
+                   data-id="' . $shopId . '" data-url="' . $route . '" data-status="' . $value . '">
+                    <i class="feather ' . $state['icon'] . ' me-3 text-' . $state['color'] . '"></i>
+                    <span>' . $state['label'] . '</span>
+                </a>
+            </li>';
+        }
+
+        return '
+        <div class="dropdown">
+            <a href="javascript:void(0)" class="badge bg-soft-' . $current['color'] . ' text-' . $current['color'] . ' c-pointer"
+               data-bs-toggle="dropdown" data-bs-offset="0,10">
+                <i class="feather ' . $current['icon'] . ' me-1"></i>
+                <span>' . $current['label'] . '</span>
+                <i class="feather feather-chevron-down ms-1"></i>
+            </a>
+            <ul class="dropdown-menu">' . $items . '</ul>
+        </div>';
+    }
+}
+
 if (!function_exists('statusChange')) {
  function statusChange($request,$modalName)
 {

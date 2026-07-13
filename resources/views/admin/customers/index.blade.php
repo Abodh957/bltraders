@@ -49,10 +49,12 @@
                                     <thead>
                                         <tr>
                                             <th>Srno</th>
-                                            <th>First Name</th>
-                                            <Th>Last Name</Th>
-                                            <Th>Email</Th>
-                                            <Th>Phone No.</Th>
+                                            <th>Shop Name</th>
+                                            <th>Phone No.</th>
+                                            <th>City</th>
+                                            <th>State</th>
+                                            <th>Pincode</th>
+                                            <th>Status</th>
                                             <th>Date</th>
                                             <th class="text-end">Actions</th>
                                         </tr>
@@ -79,7 +81,7 @@
                 }
             });
 
-            $('#customersTable').DataTable({
+            var table = $('#customersTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
@@ -98,13 +100,32 @@
                 searching: true,
                 columns: [
                     { data: 'srno', name: 'id' ,orderable: false, searchable: false},
-                    { data: 'first_name', name: 'first_name' },
-                    { data: 'last_name', name: 'last_name' },
-                    { data: 'email', name: 'email' },
+                    { data: 'shop_name', name: 'shop_name' },
                     { data: 'phone_no', name: 'phone_no' },
+                    { data: 'city', name: 'city' },
+                    { data: 'state', name: 'state' },
+                    { data: 'pincode', name: 'pincode' },
+                    { data: 'status', name: 'status', orderable: false, searchable: false },
                     { data: 'created_at', name: 'created_at' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ]
+            });
+
+            $(document).on('click', '#customersTable .shopStatusChange', function () {
+                var $item = $(this);
+
+                $.ajax({
+                    url: $item.data('url'),
+                    type: 'POST',
+                    data: { id: $item.data('id'), status: $item.data('status') },
+                    success: function () {
+                        table.ajax.reload(null, false);
+                    },
+                    error: function () {
+                        alert('Failed to update status. Please try again.');
+                        table.ajax.reload(null, false);
+                    }
+                });
             });
         });
     </script>

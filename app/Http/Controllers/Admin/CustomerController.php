@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use  App\Models\User;
+use App\Models\Shop;
 use Illuminate\Support\Arr;
 use DB;
 
@@ -14,17 +15,22 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
+    protected $Model;
+    protected $admin_ids;
+    protected $columns;
+
     function __construct(){
-        $this->middleware('permission:Customer-Management', ['only' => ['index','store','create','edit','destroy','update']]);
+        $this->middleware('permission:Customer-Management', ['only' => ['index','store','create','edit','destroy','update','getData','statusChange']]);
         $this->Model = new User;
-        $this->customer_id = DB::table('model_has_roles')->where("role_id",2)->pluck('model_id')->toArray();
+        $this->admin_ids = DB::table('model_has_roles')->where("role_id",1)->pluck('model_id')->toArray();
         $this->columns = [
-            "id",
-            'first_name',
-            'last_name',
-            'email',
-            'phone_no',
-            'created_at'
+            'users.id',
+            'shops.shop_name',
+            'users.phone_no',
+            'shops.city',
+            'shops.state',
+            'shops.pincode',
+            'users.created_at',
         ];
 
     }
@@ -155,7 +161,7 @@ class CustomerController extends Controller
             $request->order_column = $request->order[0]['column'];
             $request->order_dir = $request->order[0]['dir'];
         }
-        $request->customer_id = $this->customer_id;
+        $request->admin_ids = $this->admin_ids;
 
         $records = $this->Model->fetchCustomerData($request, $this->columns);
         $total = $records->get();
@@ -173,10 +179,12 @@ class CustomerController extends Controller
 
             $data['srno'] = $i++;
             $data['id'] = $value->id;
-            $data['first_name'] = ucfirst($value->first_name);
-            $data['last_name'] = ucfirst($value->last_name);
-            $data['email'] = ucfirst($value->email);
-            $data['phone_no'] = ucfirst($value->phone_no);
+            $data['shop_name'] = $value->shop_name ? ucfirst($value->shop_name) : '-';
+            $data['phone_no'] = $value->phone_no ?: '-';
+            $data['city'] = $value->city ? ucfirst($value->city) : '-';
+            $data['state'] = $value->state ? ucfirst($value->state) : '-';
+            $data['pincode'] = $value->pincode ?: '-';
+            $data['status'] = shopStatusSelect($value->shop_status, route('customers.statusChange'), $value->shop_id);
             $data['created_at'] = dateFormat($value->created_at); // Assuming created_at is a Carbon instance
             $action = actions([
                 'edit' => route('customers.edit', $value->id),
@@ -194,5 +202,27 @@ class CustomerController extends Controller
             'recordsFiltered' => count($total),
         ]);
         return $data;
+    }
+
+    public function statusChange(Request $request)
+    {
+        $request->validate([
+            'id'     => 'required|exists:shops,id',
+            'status' => 'required|in:pending,approved,rejected',
+        ]);
+
+        $shop = Shop::find($request->input('id'));
+
+        if (!$shop) {
+            return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
+        }
+
+        $shop->status = $request->input('status');
+        $shop->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Shop status updated successfully.',
+        ]);
     }
 }
