@@ -67,6 +67,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => true,
                 'type' => 'new_user',
+                'shopStatus' => null,
                 'message' => 'Please create shop first',
                 'token' => $token
             ]);
@@ -76,6 +77,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'type' => 'pending',
+                'shopStatus' => 'pending',
                 'message' => 'Your request is under review'
             ]);
         }
@@ -84,6 +86,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'type' => 'rejected',
+                'shopStatus' => 'rejected',
                 'message' => 'Your shop request was rejected'
             ]);
         }
@@ -93,6 +96,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'type' => 'login',
+            'shopStatus' => 'approved',
             'message' => 'Login successful',
             'token' => $token,
             'user' => $user,
