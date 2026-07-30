@@ -23,6 +23,7 @@
                         <span class="nxl-mtext">Dashboards</span>
                     </a>
                 </li>
+                {{-- Role/Permission section hidden as per request
                 <li class="nxl-item nxl-hasmenu">
                     <a href="javascript:void(0);" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-airplay"></i></span>
@@ -43,6 +44,7 @@
                         @endcan
                     </ul>
                 </li>
+                --}}
 
                 {{-- @can('Permission-Management')
                 <li class="nxl-item nxl-hasmenu {{ request()->is('admin.permissions/*') ? 'active' : '' }}">
