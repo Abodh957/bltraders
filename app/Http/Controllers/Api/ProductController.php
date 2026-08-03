@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    private string $imagePath = 'uploads/admin/products/';
 
     /**
      * GET /api/products
@@ -110,7 +110,7 @@ class ProductController extends Controller
             'is_featured'   => (bool) $p->is_featured,
             'category'      => $p->category ? ['id' => $p->category->id, 'name' => $p->category->name] : null,
             'sub_category'  => $p->subCategory ? ['id' => $p->subCategory->id, 'name' => $p->subCategory->sub_category] : null,
-            'primary_image' => $primary ? url($this->imagePath . $primary->image_path) : null,
+            'primary_image' => ProductImage::urlFor($primary?->image_path),
             'colors'        => $p->colors->map(fn($c) => [
                 'id'       => $c->id,
                 'name'     => $c->name,
@@ -139,7 +139,7 @@ class ProductController extends Controller
             'sub_category'   => $p->subCategory ? ['id' => $p->subCategory->id, 'name' => $p->subCategory->sub_category] : null,
             'images'         => $p->images->map(fn($img) => [
                 'id'         => $img->id,
-                'url'        => url($this->imagePath . $img->image_path),
+                'url'        => ProductImage::urlFor($img->image_path),
                 'is_primary' => (bool) $img->is_primary,
                 'sort_order' => $img->sort_order,
             ])->values(),

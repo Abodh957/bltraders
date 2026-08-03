@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
 
 
 Route::get('/user', function (Request $request) {
@@ -89,3 +91,45 @@ Route::middleware('auth:sanctum')->group(function () {
 // GET /api/products/{id}                     — single product detail
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
+
+/*
+|--------------------------------------------------------------------------
+| Customer APIs — cart & orders (login + approved shop required)
+|--------------------------------------------------------------------------
+| The cart is store-wise: a user holds one cart per store and each store
+| checks out into its own order, with its own GST/billing breakup.
+|
+| Cart
+|   GET    /api/cart                       — all store carts
+|   GET    /api/cart?store_id=1            — one store's cart
+|   GET    /api/cart/count                 — total items (header badge)
+|   GET    /api/cart/summary?store_id=1    — billing preview before checkout
+|   POST   /api/cart/add                   — { product_id, quantity?, color_id?, replace? }
+|   POST   /api/cart/update/{itemId}       — { quantity }  (0 removes the line)
+|   DELETE /api/cart/item/{itemId}         — remove a line
+|   DELETE /api/cart?store_id=1            — empty one cart (omit store_id for all)
+|
+| Orders
+|   POST   /api/orders                     — place order from a store cart
+|   GET    /api/orders                     — my orders (?status= &store_id= &per_page=)
+|   GET    /api/orders/{id}                — order detail + timeline
+|   POST   /api/orders/{id}/cancel         — { reason? }
+|   GET    /api/orders/{id}/invoice        — invoice / billing document
+*/
+Route::middleware(['auth:sanctum', 'shop.approved'])->group(function () {
+    // Cart
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::get('/cart/count', [CartController::class, 'count']);
+    Route::get('/cart/summary', [CartController::class, 'summary']);
+    Route::post('/cart/add', [CartController::class, 'add']);
+    Route::post('/cart/update/{itemId}', [CartController::class, 'update']);
+    Route::delete('/cart/item/{itemId}', [CartController::class, 'removeItem']);
+    Route::delete('/cart', [CartController::class, 'clear']);
+
+    // Orders
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+    Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
+});
