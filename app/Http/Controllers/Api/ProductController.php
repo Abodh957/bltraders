@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -88,6 +89,94 @@ class ProductController extends Controller
         return response()->json([
             'status' => true,
             'data'   => $this->formatDetail($product),
+        ]);
+    }
+
+    /**
+     * GET /api/products/trending
+     *
+     * Best sellers: products ranked by how many units were actually ordered.
+     * Cancelled and soft-deleted orders are excluded, so the ranking only
+     * reflects real sales.
+     *
+     * Filters (all optional):
+     *   ?store_id=1
+     *   ?category_id=1
+     *   ?sub_category_id=1
+     *   ?days=30               (trending window — only orders from last N days)
+     *   ?per_page=10           (default 15, max 100)
+     *   ?page=1
+     */
+    public function trending(Request $request)
+    {
+        $request->validate([
+            'store_id'        => 'nullable|integer|exists:stores,id',
+            'category_id'     => 'nullable|integer|exists:categories,id',
+            'sub_category_id' => 'nullable|integer|exists:sub_categories,id',
+            'days'            => 'nullable|integer|min:1|max:365',
+            'per_page'        => 'nullable|integer|min:1|max:100',
+        ]);
+
+        // Units sold per product, ignoring cancelled / deleted orders.
+        $sales = DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereNull('orders.deleted_at')
+            ->where('orders.status', '!=', 'cancelled')
+            ->whereNotNull('order_items.product_id')
+            ->when($request->filled('days'), fn($q) => $q->where(
+                'orders.created_at', '>=', now()->subDays((int) $request->days)
+            ))
+            ->groupBy('order_items.product_id')
+            ->select(
+                'order_items.product_id',
+                DB::raw('SUM(order_items.quantity) as total_sold'),
+                DB::raw('COUNT(DISTINCT order_items.order_id) as orders_count'),
+                DB::raw('SUM(order_items.line_total) as total_revenue')
+            );
+
+        $query = Product::with(['category', 'subCategory', 'primaryImage', 'colors'])
+            ->joinSub($sales, 'sales', fn($join) => $join->on('sales.product_id', '=', 'products.id'))
+            ->where('products.status', 1)
+            ->select('products.*', 'sales.total_sold', 'sales.orders_count', 'sales.total_revenue');
+
+        if ($request->filled('store_id')) {
+            $query->where('products.store_id', $request->store_id);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('products.category_id', $request->category_id);
+        }
+
+        if ($request->filled('sub_category_id')) {
+            $query->where('products.sub_category_id', $request->sub_category_id);
+        }
+
+        $query->orderByDesc('sales.total_sold')
+              ->orderByDesc('sales.orders_count')
+              ->orderByDesc('products.id');
+
+        $perPage  = (int) $request->get('per_page', 15);
+        $products = $query->paginate($perPage);
+
+        $offset = ($products->currentPage() - 1) * $products->perPage();
+
+        return response()->json([
+            'status' => true,
+            'data'   => $products->getCollection()->values()->map(function ($p, $i) use ($offset) {
+                return array_merge($this->formatList($p), [
+                    'rank'          => $offset + $i + 1,
+                    'total_sold'    => (int) $p->total_sold,
+                    'orders_count'  => (int) $p->orders_count,
+                    'total_revenue' => round((float) $p->total_revenue, 2),
+                ]);
+            })->values(),
+            'meta'   => [
+                'total'        => $products->total(),
+                'per_page'     => $products->perPage(),
+                'current_page' => $products->currentPage(),
+                'last_page'    => $products->lastPage(),
+                'days'         => $request->filled('days') ? (int) $request->days : null,
+            ],
         ]);
     }
 

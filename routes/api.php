@@ -88,8 +88,14 @@ Route::middleware('auth:sanctum')->group(function () {
 // GET /api/products?search=yoga              — search by name/sku
 // GET /api/products?featured=1              — featured only
 // GET /api/products?per_page=10&page=2       — pagination
+// GET /api/products/trending                 — best sellers (most ordered)
+// GET /api/products/trending?days=30         — trending in the last 30 days
+// GET /api/products/trending?store_id=1      — best sellers of one store
 // GET /api/products/{id}                     — single product detail
 Route::get('/products', [ProductController::class, 'index']);
+// NOTE: /products/trending MUST stay above /products/{id}, otherwise "trending"
+// is captured as an {id} and the request 404s.
+Route::get('/products/trending', [ProductController::class, 'trending']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 
 /*
