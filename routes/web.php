@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DeployController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
@@ -17,6 +18,24 @@ use App\Http\Controllers\Admin\ColorController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Deploy endpoints (no SSH on this host)
+|--------------------------------------------------------------------------
+| GET /migration?token=XXX               apply pending migrations
+| GET /migration/status?token=XXX        show ran / pending migrations
+| GET /migration/clear-cache?token=XXX   flush config, route, view, app caches
+|
+| Off unless DEPLOY_TOKEN is set in .env (routes 404 without it). Throttled and
+| logged. Destructive commands (migrate:fresh / :reset / :rollback, db:wipe) are
+| deliberately NOT exposed.
+*/
+Route::middleware('throttle:6,1')->group(function () {
+    Route::get('/migration', [DeployController::class, 'migrate']);
+    Route::get('/migration/status', [DeployController::class, 'status']);
+    Route::get('/migration/clear-cache', [DeployController::class, 'clearCache']);
 });
 
 Route::prefix('admin')->group(function () {
