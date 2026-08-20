@@ -7,6 +7,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use  App\Models\User;
 use App\Models\Shop;
+use App\Models\Order;
 use Illuminate\Support\Arr;
 use DB;
 
@@ -20,7 +21,7 @@ class CustomerController extends Controller
     protected $columns;
 
     function __construct(){
-        $this->middleware('permission:Customer-Management', ['only' => ['index','store','create','edit','destroy','update','getData','statusChange']]);
+        $this->middleware('permission:Customer-Management', ['only' => ['index','show','store','create','edit','destroy','update','getData','statusChange']]);
         $this->Model = new User;
         $this->admin_ids = DB::table('model_has_roles')->where("role_id",1)->pluck('model_id')->toArray();
         $this->columns = [
@@ -87,7 +88,28 @@ class CustomerController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $customer = User::find($id);
+
+        if (!$customer) {
+            return redirect()->route('customers.index')->with('error', 'Customer not found.');
+        }
+
+        $shop = Shop::where('user_id', $customer->id)->first();
+
+        // Order history for this customer (orders module).
+        $orders = Order::with('store')
+            ->where('user_id', $customer->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $orderStats = [
+            'total'     => $orders->count(),
+            'delivered' => $orders->where('status', 'delivered')->count(),
+            'cancelled' => $orders->where('status', 'cancelled')->count(),
+            'value'     => $orders->where('status', '!=', 'cancelled')->sum('total_amount'),
+        ];
+
+        return view('admin.customers.show', compact('customer', 'shop', 'orders', 'orderStats'));
     }
 
     /**
@@ -186,10 +208,10 @@ class CustomerController extends Controller
             $data['pincode'] = $value->pincode ?: '-';
             $data['status'] = shopStatusSelect($value->shop_status, route('customers.statusChange'), $value->shop_id);
             $data['created_at'] = dateFormat($value->created_at); // Assuming created_at is a Carbon instance
+            // Only the eye icon. Passing 'view'/'delete' would render the
+            // three-dot dropdown in actions(), which we no longer want here.
             $action = actions([
-                'edit' => route('customers.edit', $value->id),
-                'view' => '',   // You may consider removing this if it's not used
-                'delete' => ''  // You may consider removing this if it's not used
+                'edit' => route('customers.show', $value->id),
             ]);
 
             $data['actions'] = $action;

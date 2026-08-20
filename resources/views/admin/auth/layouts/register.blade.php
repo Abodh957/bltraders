@@ -6,7 +6,7 @@
             <div class="card mb-4 mt-5 mx-4 mx-sm-0 position-relative">
                 <div
                     class="wd-50 bg-white p-2 rounded-circle shadow-lg position-absolute translate-middle top-0 start-50">
-                    <img src="assets/images/logo-abbr.png" alt="" class="img-fluid">
+                    <img src="{{config('custom.public_path') . '/adminAssets/assets/images/logo-abbr.png'}}" alt="" class="img-fluid">
                 </div>
                 <div class="card-body p-sm-5">
                     <h2 class="fs-20 fw-bolder mb-4">Register</h2>

@@ -23,10 +23,13 @@
                         </a>
                     </div>
                     <div class="d-flex align-items-center gap-2 page-header-right-items-wrapper">
+                        {{-- COMMENTED: "Create Customers" button hidden --}}
+                        {{--
                         <a href="{{ route('customers.create') }}" class="btn btn-primary">
                             <i class="feather-plus me-2"></i>
                             <span>Create Customers</span>
                         </a>
+                        --}}
                     </div>
                 </div>
                 <div class="d-md-none d-flex align-items-center">
@@ -97,7 +100,8 @@
                 paging: true,
                 pageLength: 5,
                 lengthChange: false,
-                searching: true,
+                // searching: true,   // COMMENTED: search box hidden
+                searching: false,
                 columns: [
                     { data: 'srno', name: 'id' ,orderable: false, searchable: false},
                     { data: 'shop_name', name: 'shop_name' },

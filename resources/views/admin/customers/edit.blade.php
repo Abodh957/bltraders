@@ -92,7 +92,7 @@
 
                                 <div class="row mt-4">
                                     <div class="col-lg-4 mb-4 d-flex justify-content-start">
-                                        <a href="{{ route('roles.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('customers.index') }}" class="btn btn-secondary">
                                             <i class="feather-arrow-left me-2"></i>
                                             <span>Back</span>
                                         </a>

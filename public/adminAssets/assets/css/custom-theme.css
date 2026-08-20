@@ -1,0 +1,104 @@
+/*
+ * Brand colour override for the admin panel.
+ *
+ * Stock theme primary : #3454d1
+ * BL Traders primary  : #f97316
+ *
+ * GENERATED FILE -- do not hand-edit. Vendor CSS (bootstrap.min.css /
+ * theme.min.css) is untouched; this file is loaded after them and only
+ * restates the colour declarations. To change the brand colour or revert,
+ * see the regeneration command in the project session notes.
+ */
+
+:root{--bs-primary:#f97316;--bs-primary-rgb:249, 115, 22;}
+
+/* ---- from bootstrap.min.css (6 rules) ---- */
+:root{--bs-primary:#f97316;--bs-primary-rgb:249, 115, 22}
+.btn-primary{--bs-btn-bg:#f97316;--bs-btn-border-color:#f97316;--bs-btn-disabled-bg:#f97316;--bs-btn-disabled-border-color:#f97316}
+.btn-outline-primary{--bs-btn-color:#f97316;--bs-btn-border-color:#f97316;--bs-btn-hover-bg:#f97316;--bs-btn-hover-border-color:#f97316;--bs-btn-focus-shadow-rgb:249, 115, 22;--bs-btn-active-bg:#f97316;--bs-btn-active-border-color:#f97316;--bs-btn-disabled-color:#f97316}
+.progress{--bs-progress-bar-bg:#f97316}
+.text-bg-primary{background-color:RGBA(249, 115, 22,var(--bs-bg-opacity,1))!important}
+.link-primary{color:#f97316!important}
+
+/* ---- from theme.min.css (78 rules) ---- */
+a:hover{color:#f97316}
+.text-primary{color:#f97316!important}
+.bg-primary{background-color:#f97316!important}
+.bg-blue{background-color:#f97316!important}
+.border-primary{border-color:#f97316!important}
+.page-header .breadcrumb .breadcrumb-item a:hover{color:#f97316}
+.nxl-header .header-wrapper .nxl-head-link.active,.nxl-header .header-wrapper .nxl-head-link:active,.nxl-header .header-wrapper .nxl-head-link:focus,.nxl-header .header-wrapper .nxl-head-link:hover{color:#f97316}
+.nxl-header .header-wrapper .nxl-head-link.active .hamburger .hamburger-inner,.nxl-header .header-wrapper .nxl-head-link:active .hamburger .hamburger-inner,.nxl-header .header-wrapper .nxl-head-link:focus .hamburger .hamburger-inner,.nxl-header .header-wrapper .nxl-head-link:hover .hamburger .hamburger-inner{background-color:#f97316}
+.nxl-header .header-wrapper .nxl-head-link.active .hamburger .hamburger-inner::after,.nxl-header .header-wrapper .nxl-head-link.active .hamburger .hamburger-inner::before,.nxl-header .header-wrapper .nxl-head-link:active .hamburger .hamburger-inner::after,.nxl-header .header-wrapper .nxl-head-link:active .hamburger .hamburger-inner::before,.nxl-header .header-wrapper .nxl-head-link:focus .hamburger .hamburger-inner::after,.nxl-header .header-wrapper .nxl-head-link:focus .hamburger .hamburger-inner::before,.nxl-header .header-wrapper .nxl-head-link:hover .hamburger .hamburger-inner::after,.nxl-header .header-wrapper .nxl-head-link:hover .hamburger .hamburger-inner::before{background-color:#f97316}
+.nxl-header .header-wrapper .nxl-mega-menu .nxl-h-dropdown .nxl-mega-menu-tabs-content .nxl-mega-menu-miscellaneous .nxl-mega-menu-miscellaneous-tabs .nav-item .nav-link.active{color:#f97316;border-bottom:1px solid #f97316}
+.nxl-header .header-wrapper .nxl-header-language .nxl-language-dropdown .language_select.active a:before{color:#f97316}
+#languageSelectModal .language_select.active a:before{color:#f97316}
+.chatting-setting .chatting-setting-tabs a.nav-link.active,.chatting-setting .chatting-setting-tabs a.nav-link:hover{color:#f97316}
+.nxl-container.apps-notes .nxl-content .main-content .note-has-grid .single-note-item.note-works .point{color:#f97316}
+.nxl-container.apps-notes .nxl-content .main-content .note-has-grid .single-note-item.note-works .side-stick{background-color:#f97316}
+.nxl-container.apps-notes .nxl-content .main-content .note-has-grid .single-note-item.note-personal .point{color:#f97316}
+.nxl-container.apps-notes .nxl-content .main-content .note-has-grid .single-note-item.note-personal .side-stick{background-color:#f97316}
+.nxl-container.apps-calendar .nxl-content .main-content #tui-calendar-init .tui-full-calendar-confirm,.nxl-container.apps-calendar .nxl-content .main-content #tui-calendar-init .tui-full-calendar-popup-edit{background-color:#f97316!important}
+.nxl-container.apps-calendar .nxl-content .main-content #tui-calendar-init [data-calendar-id="1"]{color:#f97316}
+.badge.bg-light-primary{color:#f97316;background:shift-color(#f97316,-80%);border-color:shift-color(#f97316,-80%)}
+.btn-light-primary{color:#f97316;background:shift-color(#f97316,-80%);border-color:shift-color(#f97316,-80%)}
+.btn-light-primary:hover{background:#f97316;border-color:#f97316}
+.btn-light-primary.focus,.btn-light-primary:focus{background:#f97316;border-color:#f97316}
+.btn-light-primary:not(:disabled):not(.disabled).active,.btn-light-primary:not(:disabled):not(.disabled):active,.show>.btn-light-primary.dropdown-toggle{background:#f97316;border-color:#f97316}
+.btn-check:active+.btn-light-primary,.btn-check:checked+.btn-light-primary{background:#f97316;border-color:#f97316}
+.btn-primary,.btn-primary:hover,.btn.bg-soft-primary:focus,.btn.bg-soft-primary:hover{border-color:#f97316!important;background-color:#f97316!important}
+.card.bg-primary{box-shadow:0 10px 10px -1px rgba(249, 115, 22,.3)}
+.custom-file.active,.custom-file.focus,.custom-file:active,.custom-file:focus,.custom-select.active,.custom-select.focus,.custom-select:active,.custom-select:focus,.form-control.active,.form-control.focus,.form-control:active,.form-control:focus,.form-select.active,.form-select.focus,.form-select:active,.form-select:focus,input.active,input.focus,input:active,input:focus{border-color:#f97316!important}
+.custom-checkbox .custom-control-input:checked~.custom-control-label::before{border-color:#f97316;background-color:#f97316}
+.form-switch .form-check-input:checked{border-color:#f97316;background-color:#f97316}
+.nav-tabs-wrapper .nav-tabs-custom-style .nav-item .nav-link.active,.nav-tabs-wrapper .nav-tabs-custom-style .nav-item .nav-link.hover{color:#f97316;border-bottom:3px solid #f97316;background-color:rgba(249, 115, 22,.075)}
+.table-responsive .dataTables_paginate .active>.page-link,.table-responsive .dataTables_paginate .page-link.active{background-color:#f97316}
+ul.pagination-common-style li a.active,ul.pagination-common-style li a:hover{background-color:#f97316}
+.card-input-element+.card{color:#f97316}
+.invoice-overview-tab-item .nav-item .nav-link.active,.invoice-overview-tab-item .nav-item .nav-link:hover{color:#f97316;background-color:rgba(249, 115, 22,.075)}
+.tasks-progress-chart .circle-progress-value{stroke:#f97316}
+.goal-progress-2 .circle-progress-value,.project-progress-2 .circle-progress-value,.team-progress-2 .circle-progress-value{stroke:#f97316}
+.goal-progress .circle-progress-value{stroke:#f97316}
+.goal-progress .circle-progress-circle{fill:rgba(249, 115, 22,.075)}
+.progress-1 .circle-progress-value{stroke:#f97316}
+ul#checklist li.checked:before{border-color:#f97316}
+.customers-nav-tabs .nav-item .nav-link.active{color:#f97316;border-bottom:3px solid #f97316;background-color:rgba(249, 115, 22,.075)}
+.customers-nav-tabs .nav-item .nav-link.active{color:#f97316;border-bottom:3px solid #f97316;background-color:rgba(249, 115, 22,.075)}
+.goal-prigress .circle-progress-value{stroke:#f97316}
+.goal-prigress .circle-progress-circle{fill:rgba(249, 115, 22,.075)}
+.sales-progress-1 .circle-progress-value{stroke:#f97316}
+.lead-progress-1 .circle-progress-value{stroke:#f97316}
+.project-progress-2 .circle-progress-value,.team-progress-2 .circle-progress-value{stroke:#f97316}
+.calendar header .simple-calendar-btn:hover{color:#f97316}
+.calendar .day:hover{border:2px solid #f97316}
+.calendar .day.today{background:#f97316}
+.calendar .day.has-event{color:#f97316}
+.calendar .day.has-event:after{background:#f97316}
+.calendar .event-container .event{background:#f97316}
+.tasks-progress-chart .circle-progress-value{stroke:#f97316}
+.pace .pace-progress{background:#f97316}
+.select2-container .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--highlighted,.select2-container .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected{color:#f97316}
+.circle-progress-value{stroke:#f97316}
+.theme-customizer .customizer-handle .cutomizer-open-trigger{border:1px solid #f97316}
+.theme-customizer .customizer-sidebar-wrapper .customizer-sidebar-body .theme-options-set .theme-options-items .single-option input:checked+.options-label:before{color:#f97316}
+.theme-customizer .customizer-sidebar-wrapper .customizer-sidebar-body .theme-options-set .theme-options-items .single-option.active:before{color:#f97316}
+html.app-header-dark .nxl-header .header-wrapper .nxl-head-link.active,html.app-header-dark .nxl-header .header-wrapper .nxl-head-link:active,html.app-header-dark .nxl-header .header-wrapper .nxl-head-link:focus,html.app-header-dark .nxl-header .header-wrapper .nxl-head-link:hover{color:#f97316}
+html.app-skin-dark .dropdown-item.active,html.app-skin-dark .dropdown-item:active,html.app-skin-dark .dropdown-item:focus,html.app-skin-dark .dropdown-item:hover{color:#f97316!important}
+html.app-skin-dark .custom-file.active,html.app-skin-dark .custom-file:active,html.app-skin-dark .custom-file:focus,html.app-skin-dark .custom-file:hover,html.app-skin-dark .custom-select.active,html.app-skin-dark .custom-select:active,html.app-skin-dark .custom-select:focus,html.app-skin-dark .custom-select:hover,html.app-skin-dark .form-control.active,html.app-skin-dark .form-control:active,html.app-skin-dark .form-control:focus,html.app-skin-dark .form-control:hover,html.app-skin-dark .form-select.active,html.app-skin-dark .form-select:active,html.app-skin-dark .form-select:focus,html.app-skin-dark .form-select:hover,html.app-skin-dark input.active,html.app-skin-dark input:active,html.app-skin-dark input:focus,html.app-skin-dark input:hover,html.app-skin-dark textarea.active,html.app-skin-dark textarea:active,html.app-skin-dark textarea:focus,html.app-skin-dark textarea:hover{border-color:#f97316!important}
+html.app-skin-dark .bg-primary{background-color:#f97316!important}
+html.app-skin-dark .bg-soft-primary{background-color:rgba(249, 115, 22,.075)!important}
+html.app-skin-dark .text-primary{color:#f97316!important}
+html.app-skin-dark .border-primary{border-color:#f97316!important}
+html.app-skin-dark .accordion .accordion-item .accordion-header .accordion-button:not(.collapsed){color:#f97316}
+html.app-skin-dark .dropdown .dropdown-menu .dropdown-item.active i.bg-gray-500,html.app-skin-dark .dropdown .dropdown-menu .dropdown-item:active i.bg-gray-500,html.app-skin-dark .dropdown .dropdown-menu .dropdown-item:focus i.bg-gray-500,html.app-skin-dark .dropdown .dropdown-menu .dropdown-item:hover i.bg-gray-500{background-color:#f97316!important}
+html.app-skin-dark .nav-item .nav-link.active,html.app-skin-dark .nav-item .nav-link:hover{color:#f97316}
+html.app-skin-dark .customers-nav-tabs .nav-item .nav-link.active,html.app-skin-dark .customers-nav-tabs .nav-item .nav-link.hover,html.app-skin-dark .nav-tabs-custom-style .nav-item .nav-link.active,html.app-skin-dark .nav-tabs-custom-style .nav-item .nav-link.hover{color:#f97316!important;border-bottom-color:#f97316!important}
+html.app-skin-dark .nxl-header .header-wrapper .header-left .nxl-mega-menu .nxl-h-dropdown .nxl-mega-menu-tabs .nav-link.active,html.app-skin-dark .nxl-header .header-wrapper .header-left .nxl-mega-menu .nxl-h-dropdown .nxl-mega-menu-tabs .nav-link:hover{color:#f97316}
+html.app-skin-dark .nxl-header .header-wrapper .header-left .nxl-mega-menu .nxl-h-dropdown .nxl-mega-menu-tabs-content .nxl-mega-menu-miscellaneous .nxl-mega-menu-miscellaneous-tabs .nav-item .nav-link.active,html.app-skin-dark .nxl-header .header-wrapper .header-left .nxl-mega-menu .nxl-h-dropdown .nxl-mega-menu-tabs-content .nxl-mega-menu-miscellaneous .nxl-mega-menu-miscellaneous-tabs .nav-item .nav-link:hover{color:#f97316}
+@media (max-width:767.98px) {
+  .nxl-container .nxl-content .page-content-left-navigation-wrapper .nav-tabs-custom-style .nav-item .nav-link.active,.nxl-container .nxl-content .page-content-left-navigation-wrapper .nav-tabs-custom-style .nav-item .nav-link:hover{border-left:3px solid #f97316!important}
+}
+@media (max-width:991.98px) {
+  .nxl-header .header-wrapper .header-left .nxl-lavel-mega-menu .nxl-lavel-mega-menu-wrapper .nxl-mega-menu .nxl-h-dropdown .nxl-mega-menu-tabs-content .nxl-mega-menu-miscellaneous .nxl-mega-menu-miscellaneous-tabs .nav-item .nav-link.active{border-left:1px solid #f97316}
+}
+

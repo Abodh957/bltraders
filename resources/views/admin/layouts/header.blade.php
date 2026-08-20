@@ -1,3 +1,20 @@
+@php
+    // Logged-in admin — drives the avatar button and the profile dropdown below.
+    $authUser = auth()->user();
+
+    $authName = $authUser?->name
+        ?: trim(($authUser?->first_name ?? '') . ' ' . ($authUser?->last_name ?? ''));
+    $authName = $authName !== '' ? ucfirst($authName) : 'User';
+
+    $authRole = $authUser?->getRoleNames()->first() ?: ucfirst((string) ($authUser?->role ?? ''));
+
+    // users table has no image column yet, so this falls back to the theme avatar.
+    // Add an `image` column (files in public/uploads/admin/users/) and it starts working
+    // automatically — no change needed here.
+    $authAvatar = !empty($authUser?->image)
+        ? url('public/uploads/admin/users/' . $authUser->image)
+        : config('custom.public_path') . '/adminAssets/assets/images/avatar/1.png';
+@endphp
 <!--! ================================================================ !-->
 <!--! [Start] Header !-->
 <!--! ================================================================ !-->
@@ -24,6 +41,8 @@
                 </a>
             </div>
             <!--! [End] nxl-navigation-toggle !-->
+        {{-- COMMENTED: "+" quick-add button & MEGA MENU hidden from admin header --}}
+        {{--
             <!--! [Start] nxl-lavel-mega-menu-toggle !-->
             <div class="nxl-lavel-mega-menu-toggle d-flex d-lg-none">
                 <a href="javascript:void(0);" id="nxl-lavel-mega-menu-open">
@@ -1775,11 +1794,14 @@
                 <!--! [End] nxl-lavel-mega-menu-wrapper !-->
             </div>
             <!--! [End] nxl-lavel-mega-menu !-->
+        --}}
         </div>
         <!--! [End] Header Left !-->
         <!--! [Start] Header Right !-->
         <div class="header-right ms-auto">
             <div class="d-flex align-items-center">
+                {{-- COMMENTED: header search icon hidden --}}
+                {{--
                 <div class="dropdown nxl-h-item nxl-header-search">
                     <a href="javascript:void(0);" class="nxl-head-link me-0" data-bs-toggle="dropdown"
                         data-bs-auto-close="outside">
@@ -2013,6 +2035,9 @@
                         </div>
                     </div>
                 </div>
+                --}}
+                {{-- COMMENTED: language / country-flag switcher hidden --}}
+                {{--
                 <div class="dropdown nxl-h-item nxl-header-language d-none d-sm-flex">
                     <a href="javascript:void(0);" class="nxl-head-link me-0 nxl-language-link" data-bs-toggle="dropdown"
                         data-bs-auto-close="outside">
@@ -2133,6 +2158,7 @@
                         </div>
                     </div>
                 </div>
+                --}}
                 <div class="nxl-h-item d-none d-sm-flex">
                     <div class="full-screen-switcher">
                         <a href="javascript:void(0);" class="nxl-head-link me-0"
@@ -2150,6 +2176,8 @@
                         <i class="feather-sun"></i>
                     </a>
                 </div>
+                {{-- COMMENTED: timer / clock dropdown (green badge) hidden --}}
+                {{--
                 <div class="dropdown nxl-h-item">
                     <a href="javascript:void(0);" class="nxl-head-link me-0" data-bs-toggle="dropdown" role="button"
                         data-bs-auto-close="outside">
@@ -2175,6 +2203,7 @@
                         </div>
                     </div>
                 </div>
+                --}}
                 <div class="dropdown nxl-h-item">
                     <a class="nxl-head-link me-3" data-bs-toggle="dropdown" href="#" role="button"
                         data-bs-auto-close="outside">
@@ -2260,19 +2289,24 @@
                 </div>
                 <div class="dropdown nxl-h-item">
                     <a href="javascript:void(0);" data-bs-toggle="dropdown" role="button" data-bs-auto-close="outside">
-                        <img src="{{ config('custom.public_path') . '/adminAssets/assets/images/avatar/1.png'}}" alt="user-image" class="img-fluid user-avtar me-0" />
+                        <img src="{{ $authAvatar }}" alt="{{ $authName }}" class="img-fluid user-avtar me-0" />
                     </a>
                     <div class="dropdown-menu dropdown-menu-end nxl-h-dropdown nxl-user-dropdown">
                         <div class="dropdown-header">
                             <div class="d-flex align-items-center">
-                                <img src="{{ config('custom.public_path') . '/adminAssets/assets/images/avatar/1.png'}}" alt="user-image" class="img-fluid user-avtar" />
+                                <img src="{{ $authAvatar }}" alt="{{ $authName }}" class="img-fluid user-avtar" />
                                 <div>
-                                    <h6 class="text-dark mb-0">Alexandra Della <span
-                                            class="badge bg-soft-success text-success ms-1">PRO</span></h6>
-                                    <span class="fs-12 fw-medium text-muted">alex.della@outlook.com</span>
+                                    <h6 class="text-dark mb-0">{{ $authName }}
+                                        @if($authRole)
+                                            <span class="badge bg-soft-success text-success ms-1">{{ $authRole }}</span>
+                                        @endif
+                                    </h6>
+                                    <span class="fs-12 fw-medium text-muted">{{ $authUser?->email ?: ($authUser?->phone_no ?: '-') }}</span>
                                 </div>
                             </div>
                         </div>
+                        {{-- COMMENTED: profile menu items hidden (Active, Subscriptions, Profile Details, Activity Feed, Billing Details, Notifications) --}}
+                        {{--
                         <div class="dropdown">
                             <a href="javascript:void(0);" class="dropdown-item" data-bs-toggle="dropdown">
                                 <span class="hstack">
@@ -2394,6 +2428,7 @@
                             <i class="feather-bell"></i>
                             <span>Notifications</span>
                         </a>
+                        --}}
                         <a href="javascript:void(0);" class="dropdown-item">
                             <i class="feather-settings"></i>
                             <span>Account Settings</span>

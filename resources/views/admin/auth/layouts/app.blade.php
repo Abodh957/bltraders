@@ -24,6 +24,9 @@
     <!--! BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="{{ config('custom.public_path').'/adminAssets/assets/css/theme.min.css'}}">
     <!--! END: Custom CSS-->
+    <!--! BEGIN: Brand Colour Override — MUST stay after theme.min.css to win the cascade -->
+    <link rel="stylesheet" type="text/css" href="{{ config('custom.public_path').'/adminAssets/assets/css/custom-theme.css'}}">
+    <!--! END: Brand Colour Override-->
 
 </head>
 
