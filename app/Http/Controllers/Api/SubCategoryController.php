@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
+use App\Support\StoreContext;
 
 class SubCategoryController extends Controller
 {
@@ -14,9 +15,9 @@ class SubCategoryController extends Controller
     {
         $query = SubCategory::with(['store', 'category'])->where('status', 1);
 
-        if ($request->store_id) {
-            $query->where('store_id', $request->store_id);
-        }
+        // ?store_id= wins; otherwise the customer's selected store applies.
+        StoreContext::apply($query, StoreContext::resolve($request));
+
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
         }

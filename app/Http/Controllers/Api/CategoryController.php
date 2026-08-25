@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Support\StoreContext;
 
 class CategoryController extends Controller
 {
@@ -14,9 +15,8 @@ class CategoryController extends Controller
     {
         $query = Category::with('store')->where('status', 1);
 
-        if ($request->store_id) {
-            $query->where('store_id', $request->store_id);
-        }
+        // ?store_id= wins; otherwise the customer's selected store applies.
+        StoreContext::apply($query, StoreContext::resolve($request));
 
         $categories = $query->orderBy('name')->get()->map(fn($c) => $this->format($c));
 

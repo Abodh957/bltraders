@@ -5,15 +5,20 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\Request;
+use App\Support\StoreContext;
 
 class BannerController extends Controller
 {
     private string $uploadPath = 'uploads/admin/Banner/';
 
-    public function index()
+    public function index(Request $request)
     {
-        $banners = Banner::where('status', 1)
-            ->orderBy('order', 'asc')
+        $query = Banner::where('status', 1);
+
+        // Banners with a null store_id are global — shown in every store.
+        StoreContext::apply($query, StoreContext::resolve($request), 'store_id', true);
+
+        $banners = $query->orderBy('order', 'asc')
             ->get()
             ->map(fn($b) => $this->format($b));
 

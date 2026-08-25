@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\BillingService;
 use Illuminate\Http\Request;
+use App\Support\StoreContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -36,7 +37,8 @@ class CartController extends Controller
 
         $carts = Cart::with($this->itemRelations())
             ->where('user_id', $request->user()->id)
-            ->when($request->filled('store_id'), fn($q) => $q->where('store_id', $request->store_id))
+            ->when(StoreContext::resolve($request) !== null,
+                fn($q) => $q->where('store_id', StoreContext::resolve($request)))
             ->with('store')
             ->get();
 
@@ -248,8 +250,10 @@ class CartController extends Controller
             'store_id' => 'nullable|integer|exists:stores,id',
         ]);
 
+        $storeId = StoreContext::resolve($request);
+
         $carts = Cart::where('user_id', $request->user()->id)
-            ->when($request->filled('store_id'), fn($q) => $q->where('store_id', $request->store_id))
+            ->when($storeId !== null, fn($q) => $q->where('store_id', $storeId))
             ->get();
 
         foreach ($carts as $cart) {
@@ -259,7 +263,7 @@ class CartController extends Controller
 
         return response()->json([
             'status'  => true,
-            'message' => $request->filled('store_id') ? 'Cart cleared.' : 'All carts cleared.',
+            'message' => $storeId !== null ? 'Cart cleared.' : 'All carts cleared.',
         ]);
     }
 
@@ -268,8 +272,13 @@ class CartController extends Controller
      */
     public function count(Request $request)
     {
-        $count = CartItem::whereIn('cart_id', Cart::where('user_id', $request->user()->id)->select('id'))
-            ->sum('quantity');
+        $storeId = StoreContext::resolve($request);
+
+        $carts = Cart::where('user_id', $request->user()->id)
+            ->when($storeId !== null, fn($q) => $q->where('store_id', $storeId))
+            ->select('id');
+
+        $count = CartItem::whereIn('cart_id', $carts)->sum('quantity');
 
         return response()->json([
             'status' => true,
@@ -283,12 +292,21 @@ class CartController extends Controller
     public function summary(Request $request)
     {
         $request->validate([
-            'store_id' => 'required|integer|exists:stores,id',
+            'store_id' => 'nullable|integer|exists:stores,id',
         ]);
+
+        $storeId = StoreContext::resolve($request);
+
+        if ($storeId === null) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Select a store first, or pass store_id.',
+            ], 422);
+        }
 
         $cart = Cart::with($this->itemRelations())->with('store')
             ->where('user_id', $request->user()->id)
-            ->where('store_id', $request->store_id)
+            ->where('store_id', $storeId)
             ->first();
 
         if (!$cart || $cart->items->isEmpty()) {

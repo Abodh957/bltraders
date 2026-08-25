@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -28,7 +29,8 @@ class BrandController extends Controller
 
     public function create()
     {
-        return view('admin.brands.create');
+        $stores = Store::where('status', 1)->orderBy('name')->get();
+        return view('admin.brands.create', compact('stores'));
     }
 
     public function store(Request $request)
@@ -44,6 +46,7 @@ class BrandController extends Controller
             'meta_description' => 'nullable|string',
             'status'           => 'required|in:0,1',
             'sort_order'       => 'nullable|integer|min:0',
+            'store_id'         => 'nullable|exists:stores,id',
         ]);
 
         $slug      = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);
@@ -61,6 +64,8 @@ class BrandController extends Controller
             'meta_description' => $request->meta_description,
             'status'           => $request->status,
             'sort_order'       => $request->sort_order ?? 0,
+            // null = global brand, shown in every store
+            'store_id'         => $request->store_id ?: null,
         ]);
 
         return redirect()->route('brands.index')->with('success', 'Brand created successfully.');
@@ -79,7 +84,8 @@ class BrandController extends Controller
         $brand = Brand::findOrFail($id);
         $brand->logo_url  = $brand->logo  ? '/' . $this->logoPath  . $brand->logo  : null;
         $brand->cover_url = $brand->cover_image ? '/' . $this->coverPath . $brand->cover_image : null;
-        return view('admin.brands.edit', compact('brand'));
+        $stores = Store::where('status', 1)->orderBy('name')->get();
+        return view('admin.brands.edit', compact('brand', 'stores'));
     }
 
     public function update(Request $request, Brand $brand)
@@ -95,6 +101,7 @@ class BrandController extends Controller
             'meta_description' => 'nullable|string',
             'status'           => 'required|in:0,1',
             'sort_order'       => 'nullable|integer|min:0',
+            'store_id'         => 'nullable|exists:stores,id',
         ]);
 
         $slug      = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);
@@ -104,6 +111,8 @@ class BrandController extends Controller
         $brand->update([
             'name'             => $request->name,
             'slug'             => $slug,
+            // null = global brand, shown in every store
+            'store_id'         => $request->store_id ?: null,
             'logo'             => $logoName,
             'cover_image'      => $coverName,
             'description'      => $request->description,

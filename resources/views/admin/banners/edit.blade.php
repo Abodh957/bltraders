@@ -34,6 +34,16 @@
                                 @method('PUT')
                                 <div class="row">
                                     <div class="col-lg-6 mb-4">
+                                        <label class="form-label">Store</label>
+                                        <select name="store_id" class="form-control">
+                                            <option value="">All Stores (global)</option>
+                                            @foreach($stores as $s)
+                                                <option value="{{ $s->id }}" {{ old('store_id', $banner->store_id) == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <small class="text-muted">Leave as "All Stores" to show it in every store.</small>
+                                    </div>
+                                    <div class="col-lg-6 mb-4">
                                         <label class="form-label">Title <span class="text-danger">*</span></label>
                                         <input type="text" name="title" value="{{ old('title', $banner->title) }}"
                                             placeholder="Enter banner title"

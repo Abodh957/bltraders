@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use App\Support\StoreContext;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -28,9 +29,8 @@ class ProductController extends Controller
         $query = Product::with(['category', 'subCategory', 'primaryImage', 'colors', 'specifications'])
             ->where('status', 1);
 
-        if ($request->filled('store_id')) {
-            $query->where('store_id', $request->store_id);
-        }
+        // ?store_id= wins; otherwise the customer's selected store applies.
+        StoreContext::apply($query, StoreContext::resolve($request));
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
@@ -139,9 +139,8 @@ class ProductController extends Controller
             ->where('products.status', 1)
             ->select('products.*', 'sales.total_sold', 'sales.orders_count', 'sales.total_revenue');
 
-        if ($request->filled('store_id')) {
-            $query->where('products.store_id', $request->store_id);
-        }
+        // ?store_id= wins; otherwise the customer's selected store applies.
+        StoreContext::apply($query, StoreContext::resolve($request), 'products.store_id');
 
         if ($request->filled('category_id')) {
             $query->where('products.category_id', $request->category_id);

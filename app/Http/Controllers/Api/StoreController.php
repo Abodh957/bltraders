@@ -74,6 +74,63 @@ class StoreController extends Controller
         return response()->json(['status' => true, 'message' => 'Store deleted successfully.']);
     }
 
+    /**
+     * POST /api/store/select   { store_id }
+     *
+     * Remembers the store for the logged-in customer. Every other API then
+     * returns that store's data without needing ?store_id= on each call.
+     */
+    public function select(Request $request)
+    {
+        $request->validate([
+            'store_id' => 'required|integer|exists:stores,id',
+        ]);
+
+        $store = Store::where('id', $request->store_id)->where('status', 1)->first();
+
+        if (!$store) {
+            return response()->json(['status' => false, 'message' => 'This store is not available.'], 422);
+        }
+
+        $user = $request->user();
+        $user->selected_store_id = $store->id;
+        $user->save();
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Store selected successfully.',
+            'data'    => $this->format($store),
+        ]);
+    }
+
+    /**
+     * GET /api/store/selected — the customer's current store, if any.
+     */
+    public function selected(Request $request)
+    {
+        $user  = $request->user();
+        $store = $user->selected_store_id
+            ? Store::where('id', $user->selected_store_id)->where('status', 1)->first()
+            : null;
+
+        return response()->json([
+            'status' => true,
+            'data'   => $store ? $this->format($store) : null,
+        ]);
+    }
+
+    /**
+     * DELETE /api/store/selected — clear it, back to seeing everything.
+     */
+    public function clearSelected(Request $request)
+    {
+        $user = $request->user();
+        $user->selected_store_id = null;
+        $user->save();
+
+        return response()->json(['status' => true, 'message' => 'Store selection cleared.']);
+    }
+
     private function format(Store $store): array
     {
         return [

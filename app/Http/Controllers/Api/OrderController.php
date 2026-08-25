@@ -12,6 +12,7 @@ use App\Models\ProductImage;
 use App\Models\Shop;
 use App\Services\BillingService;
 use Illuminate\Http\Request;
+use App\Support\StoreContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -35,7 +36,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'store_id'         => 'required|integer|exists:stores,id',
+            'store_id'         => 'nullable|integer|exists:stores,id',
             'payment_method'   => 'nullable|in:cod,online',
             'shipping_name'    => 'nullable|string|max:255',
             'shipping_phone'   => 'nullable|string|max:20',
@@ -49,6 +50,16 @@ class OrderController extends Controller
 
         $user = $request->user();
         $shop = Shop::where('user_id', $user->id)->first();
+
+        // ?store_id / body store_id wins; otherwise the customer's selected store.
+        $storeId = StoreContext::resolve($request);
+
+        if ($storeId === null) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Select a store first, or pass store_id.',
+            ], 422);
+        }
 
         $shipping = $this->resolveShippingAddress($request, $shop, $user);
 
@@ -64,10 +75,10 @@ class OrderController extends Controller
         }
 
         try {
-            $order = DB::transaction(function () use ($request, $user, $shop, $shipping) {
+            $order = DB::transaction(function () use ($request, $user, $shop, $shipping, $storeId) {
                 $cart = Cart::with(['items.product', 'items.color'])
                     ->where('user_id', $user->id)
-                    ->where('store_id', $request->store_id)
+                    ->where('store_id', $storeId)
                     ->lockForUpdate()
                     ->first();
 
@@ -188,7 +199,8 @@ class OrderController extends Controller
         $query = Order::with(['store', 'items'])
             ->where('user_id', $request->user()->id)
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
-            ->when($request->filled('store_id'), fn($q) => $q->where('store_id', $request->store_id))
+            ->when(StoreContext::resolve($request) !== null,
+                fn($q) => $q->where('store_id', StoreContext::resolve($request)))
             ->orderByDesc('created_at');
 
         $perPage = (int) $request->get('per_page', 15);

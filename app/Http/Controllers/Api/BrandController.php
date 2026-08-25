@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use App\Support\StoreContext;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -13,10 +14,14 @@ class BrandController extends Controller
     private string $logoPath  = 'uploads/admin/Brand/logo/';
     private string $coverPath = 'uploads/admin/Brand/cover/';
 
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::where('status', 1)
-            ->orderBy('sort_order', 'asc')
+        $query = Brand::where('status', 1);
+
+        // Brands with a null store_id are global — shown in every store.
+        StoreContext::apply($query, StoreContext::resolve($request), 'store_id', true);
+
+        $brands = $query->orderBy('sort_order', 'asc')
             ->get()
             ->map(fn($b) => $this->format($b));
 
@@ -144,8 +149,11 @@ class BrandController extends Controller
             'id'               => $brand->id,
             'name'             => $brand->name,
             'slug'             => $brand->slug,
-            'logo'             => $brand->logo  ? url($this->logoPath  . $brand->logo)  : null,
-            'cover_image'      => $brand->cover_image ? url($this->coverPath . $brand->cover_image) : null,
+            // APP_URL points at the app root while the files live under public/,
+            // so the "public/" segment has to be included — same as banners,
+            // categories and sub-categories.
+            'logo'             => $brand->logo  ? url('public/' . $this->logoPath  . $brand->logo)  : null,
+            'cover_image'      => $brand->cover_image ? url('public/' . $this->coverPath . $brand->cover_image) : null,
             'description'      => $brand->description,
             'website_url'      => $brand->website_url,
             'meta_title'       => $brand->meta_title,

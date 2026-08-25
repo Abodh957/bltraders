@@ -51,6 +51,15 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/stores', [StoreController::class, 'index']);
 Route::get('/stores/{id}', [StoreController::class, 'show']);
 
+// Store selection (protected) — sets the store for the logged-in customer.
+// After this, products/categories/sub-categories/brands/banners all return that
+// store's data automatically, without needing ?store_id= on every call.
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/store/select', [StoreController::class, 'select']);
+    Route::get('/store/selected', [StoreController::class, 'selected']);
+    Route::delete('/store/selected', [StoreController::class, 'clearSelected']);
+});
+
 // Store API (protected)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/stores', [StoreController::class, 'store']);

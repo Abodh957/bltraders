@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +32,8 @@ class BannerController extends Controller
 
     public function create()
     {
-        return view('admin.banners.create');
+        $stores = Store::where('status', 1)->orderBy('name')->get();
+        return view('admin.banners.create', compact('stores'));
     }
 
     public function store(Request $request)
@@ -41,6 +43,7 @@ class BannerController extends Controller
             'heading' => 'nullable|string|max:255',
             'image'   => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'order'   => 'nullable|integer|min:0',
+            'store_id' => 'nullable|exists:stores,id',
             'status'  => 'required|in:0,1',
         ]);
 
@@ -57,6 +60,8 @@ class BannerController extends Controller
             'heading' => $request->heading,
             'image'   => $imageName,
             'order'   => $request->order ?? 0,
+            // null = global banner, shown in every store
+            'store_id' => $request->store_id ?: null,
             'status'  => $request->status,
         ]);
 
@@ -74,7 +79,8 @@ class BannerController extends Controller
     {
         $banner = Banner::findOrFail($id);
         $banner->image_url = '/' . $this->uploadPath . $banner->image;
-        return view('admin.banners.edit', compact('banner'));
+        $stores = Store::where('status', 1)->orderBy('name')->get();
+        return view('admin.banners.edit', compact('banner', 'stores'));
     }
 
     public function update(Request $request, Banner $banner)
@@ -84,6 +90,7 @@ class BannerController extends Controller
             'heading' => 'nullable|string|max:255',
             'image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'order'   => 'nullable|integer|min:0',
+            'store_id' => 'nullable|exists:stores,id',
             'status'  => 'required|in:0,1',
         ]);
 
@@ -103,6 +110,8 @@ class BannerController extends Controller
 
         $banner->update([
             'title'   => $request->title,
+            // null = global banner, shown in every store
+            'store_id' => $request->store_id ?: null,
             'heading' => $request->heading,
             'image'   => $imageName,
             'order'   => $request->order ?? 0,

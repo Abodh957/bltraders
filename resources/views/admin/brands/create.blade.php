@@ -33,6 +33,16 @@
                                 <h6 class="text-muted fw-bold mb-3 text-uppercase" style="font-size:11px;letter-spacing:1px;">Basic Information</h6>
                                 <div class="row">
                                     <div class="col-lg-4 mb-4">
+                                        <label class="form-label">Store</label>
+                                        <select name="store_id" class="form-control">
+                                            <option value="">All Stores (global)</option>
+                                            @foreach($stores as $s)
+                                                <option value="{{ $s->id }}" {{ old('store_id') == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <small class="text-muted">Leave as "All Stores" to show it in every store.</small>
+                                    </div>
+                                    <div class="col-lg-4 mb-4">
                                         <label class="form-label">Brand Name <span class="text-danger">*</span></label>
                                         <input type="text" name="name" value="{{ old('name') }}" id="nameInput"
                                             placeholder="Enter brand name"
