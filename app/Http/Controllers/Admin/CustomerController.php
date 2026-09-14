@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use  App\Models\User;
 use App\Models\Shop;
 use App\Models\Order;
+use App\Models\DeliveryAddress;
 use Illuminate\Support\Arr;
 use DB;
 
@@ -109,7 +110,12 @@ class CustomerController extends Controller
             'value'     => $orders->where('status', '!=', 'cancelled')->sum('total_amount'),
         ];
 
-        return view('admin.customers.show', compact('customer', 'shop', 'orders', 'orderStats'));
+        $addresses = DeliveryAddress::where('user_id', $customer->id)
+            ->orderByDesc('is_default')
+            ->orderByDesc('updated_at')
+            ->get();
+
+        return view('admin.customers.show', compact('customer', 'shop', 'orders', 'orderStats', 'addresses'));
     }
 
     /**

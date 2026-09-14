@@ -138,6 +138,48 @@
                     </div>
                 </div>
 
+                {{-- Delivery addresses --}}
+                <div class="col-lg-12">
+                    <div class="card stretch stretch-full">
+                        <div class="card-header">
+                            <h5 class="card-title"><i class="feather-map-pin me-2"></i>Delivery Addresses</h5>
+                            <span class="badge bg-soft-dark text-dark">{{ $addresses->count() }}</span>
+                        </div>
+                        <div class="card-body">
+                            @if($addresses->count())
+                                <div class="row">
+                                    @foreach($addresses as $addr)
+                                        <div class="col-lg-4 col-md-6 mb-3">
+                                            <div class="border rounded p-3 h-100">
+                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                    <span class="fw-semibold text-dark">{{ $addr->name }}</span>
+                                                    <span>
+                                                        <span class="badge bg-soft-info text-info">{{ ucfirst($addr->type) }}</span>
+                                                        @if($addr->is_default)
+                                                            <span class="badge bg-soft-success text-success">Default</span>
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                                <p class="fs-12 text-muted mb-1">{{ $addr->fullAddress() }}</p>
+                                                <p class="fs-12 text-muted mb-1">{{ $addr->city }}, {{ $addr->state }} - {{ $addr->pincode }}</p>
+                                                <p class="fs-12 text-muted mb-0">
+                                                    <i class="feather-phone me-1"></i>{{ $addr->phone }}
+                                                    @if($addr->alternate_phone) / {{ $addr->alternate_phone }} @endif
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-4">
+                                    <i class="feather-map-pin fs-1 mb-3 text-muted d-block"></i>
+                                    <p class="text-muted mb-0">No delivery addresses saved yet.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Order summary --}}
                 <div class="col-lg-12">
                     <div class="card stretch stretch-full">

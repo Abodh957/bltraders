@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\DeliveryAddressController;
 
 
 Route::get('/user', function (Request $request) {
@@ -130,6 +131,15 @@ Route::get('/products/{id}', [ProductController::class, 'show']);
 |   GET    /api/orders/{id}                — order detail + timeline
 |   POST   /api/orders/{id}/cancel         — { reason? }
 |   GET    /api/orders/{id}/invoice        — invoice / billing document
+|
+| Delivery addresses (a customer can keep many; one is the default)
+|   GET    /api/addresses                  — my addresses, default first
+|   GET    /api/addresses/default          — the default address (or null)
+|   GET    /api/addresses/{id}             — one address
+|   POST   /api/addresses                  — add
+|   POST   /api/addresses/{id}             — update (send only changed fields)
+|   POST   /api/addresses/{id}/default     — make it the default
+|   DELETE /api/addresses/{id}             — remove
 */
 Route::middleware(['auth:sanctum', 'shop.approved'])->group(function () {
     // Cart
@@ -147,4 +157,13 @@ Route::middleware(['auth:sanctum', 'shop.approved'])->group(function () {
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
     Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
+
+    // Delivery addresses — /default MUST stay above /{id}
+    Route::get('/addresses', [DeliveryAddressController::class, 'index']);
+    Route::get('/addresses/default', [DeliveryAddressController::class, 'defaultAddress']);
+    Route::get('/addresses/{id}', [DeliveryAddressController::class, 'show']);
+    Route::post('/addresses', [DeliveryAddressController::class, 'store']);
+    Route::post('/addresses/{id}', [DeliveryAddressController::class, 'update']);
+    Route::post('/addresses/{id}/default', [DeliveryAddressController::class, 'makeDefault']);
+    Route::delete('/addresses/{id}', [DeliveryAddressController::class, 'destroy']);
 });

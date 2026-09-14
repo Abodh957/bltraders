@@ -90,4 +90,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Shop::class, 'user_id');
     }
+
+    public function deliveryAddresses()
+    {
+        return $this->hasMany(DeliveryAddress::class);
+    }
 }

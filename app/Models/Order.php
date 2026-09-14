@@ -46,6 +46,12 @@ class Order extends Model
         return $this->belongsTo(Store::class);
     }
 
+    public function deliveryAddress()
+    {
+        // withTrashed: the customer may have removed the address after ordering.
+        return $this->belongsTo(DeliveryAddress::class)->withTrashed();
+    }
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);

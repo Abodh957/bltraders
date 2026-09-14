@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\DeliveryAddress;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
@@ -27,16 +28,23 @@ class OrderController extends Controller
 
     /**
      * POST /api/orders
-     * { store_id, payment_method?, shipping_name?, shipping_phone?,
-     *   shipping_address?, shipping_city?, shipping_state?, shipping_country?,
-     *   shipping_pincode?, notes? }
+     * { delivery_address_id?, store_id?, payment_method?, notes?,
+     *   shipping_name?, shipping_phone?, shipping_address?, shipping_city?,
+     *   shipping_state?, shipping_country?, shipping_pincode? }
      *
-     * Address fields fall back to the user's registered shop when omitted.
+     * Where the delivery address comes from, in order:
+     *   1. delivery_address_id  — one of the customer's saved addresses
+     *   2. shipping_* fields    — typed in for this order (older app builds)
+     *   3. the default saved address
+     *   4. the registered shop address
+     * Whatever is used is copied into the order's shipping_* columns, so later
+     * edits to a saved address never change an order that was already placed.
      */
     public function store(Request $request)
     {
         $request->validate([
-            'store_id'         => 'nullable|integer|exists:stores,id',
+            'store_id'            => 'nullable|integer|exists:stores,id',
+            'delivery_address_id' => 'nullable|integer',
             'payment_method'   => 'nullable|in:cod,online',
             'shipping_name'    => 'nullable|string|max:255',
             'shipping_phone'   => 'nullable|string|max:20',
@@ -61,7 +69,23 @@ class OrderController extends Controller
             ], 422);
         }
 
-        $shipping = $this->resolveShippingAddress($request, $shop, $user);
+        // A delivery_address_id must be one of this customer's own live addresses.
+        $savedAddress = null;
+        if ($request->filled('delivery_address_id')) {
+            $savedAddress = DeliveryAddress::whereKey($request->delivery_address_id)
+                ->where('user_id', $user->id)
+                ->first();
+
+            if (!$savedAddress) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Selected delivery address was not found.',
+                    'errors'  => ['delivery_address_id' => ['Selected delivery address was not found.']],
+                ], 422);
+            }
+        }
+
+        [$shipping, $deliveryAddressId] = $this->resolveShippingAddress($request, $shop, $user, $savedAddress);
 
         if (empty($shipping['shipping_address']) || empty($shipping['shipping_phone'])) {
             return response()->json([
@@ -75,7 +99,7 @@ class OrderController extends Controller
         }
 
         try {
-            $order = DB::transaction(function () use ($request, $user, $shop, $shipping, $storeId) {
+            $order = DB::transaction(function () use ($request, $user, $shop, $shipping, $storeId, $deliveryAddressId) {
                 $cart = Cart::with(['items.product', 'items.color'])
                     ->where('user_id', $user->id)
                     ->where('store_id', $storeId)
@@ -139,6 +163,7 @@ class OrderController extends Controller
                     'user_id'         => $user->id,
                     'shop_id'         => $shop?->id,
                     'store_id'        => $cart->store_id,
+                    'delivery_address_id' => $deliveryAddressId,
                     'status'          => 'pending',
                     'payment_method'  => $request->payment_method ?? 'cod',
                     'payment_status'  => 'pending',
@@ -365,11 +390,32 @@ class OrderController extends Controller
     }
 
     /**
-     * Request fields win; anything left blank falls back to the user's shop.
+     * Returns [shipping_* snapshot, delivery_address_id|null].
+     *
+     * delivery_address_id is only recorded when the snapshot really is that
+     * saved address — never when typed-in fields were mixed in.
      */
-    private function resolveShippingAddress(Request $request, ?Shop $shop, $user): array
+    private function resolveShippingAddress(Request $request, ?Shop $shop, $user, ?DeliveryAddress $saved): array
     {
-        return [
+        // 1. Explicitly chosen saved address — used exactly as saved.
+        if ($saved) {
+            return [$saved->toShippingSnapshot(), $saved->id];
+        }
+
+        $typed = collect(['shipping_name', 'shipping_phone', 'shipping_address', 'shipping_city',
+                          'shipping_state', 'shipping_country', 'shipping_pincode'])
+            ->contains(fn($f) => $request->filled($f));
+
+        // 3. Nothing typed in: the customer's default saved address, if any.
+        if (!$typed) {
+            $default = DeliveryAddress::where('user_id', $user->id)->where('is_default', true)->first();
+            if ($default) {
+                return [$default->toShippingSnapshot(), $default->id];
+            }
+        }
+
+        // 2 / 4. Typed-in fields win; blanks fall back to the registered shop.
+        return [[
             'shipping_name'    => $request->shipping_name    ?: ($shop->shop_name ?? $user->name),
             'shipping_phone'   => $request->shipping_phone   ?: $user->phone_no,
             'shipping_address' => $request->shipping_address ?: ($shop->shop_address ?? null),
@@ -377,7 +423,7 @@ class OrderController extends Controller
             'shipping_state'   => $request->shipping_state   ?: ($shop->state ?? null),
             'shipping_country' => $request->shipping_country ?: ($shop->country ?? null),
             'shipping_pincode' => $request->shipping_pincode ?: ($shop->pincode ?? null),
-        ];
+        ], null];
     }
 
     private function billingBlock(Order $order): array
@@ -445,6 +491,7 @@ class OrderController extends Controller
             ] : null,
             'items'   => $order->items->map(fn(OrderItem $i) => $this->formatItem($i))->values(),
             'billing' => $this->billingBlock($order),
+            'delivery_address_id' => $order->delivery_address_id,
             'shipping_address' => [
                 'name'    => $order->shipping_name,
                 'phone'   => $order->shipping_phone,
