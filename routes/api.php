@@ -108,6 +108,12 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/trending', [ProductController::class, 'trending']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 
+// Invoice PDF via a temporary signed link (issued by /api/orders/{id}/invoice/link).
+// No login: the signature ties the URL to one order and it expires.
+Route::get('/invoices/{id}/pdf', [OrderController::class, 'signedInvoicePdf'])
+    ->middleware(['signed', 'throttle:30,1'])
+    ->name('invoices.signed-pdf');
+
 /*
 |--------------------------------------------------------------------------
 | Customer APIs — cart & orders (login + approved shop required)
@@ -130,7 +136,9 @@ Route::get('/products/{id}', [ProductController::class, 'show']);
 |   GET    /api/orders                     — my orders (?status= &store_id= &per_page=)
 |   GET    /api/orders/{id}                — order detail + timeline
 |   POST   /api/orders/{id}/cancel         — { reason? }
-|   GET    /api/orders/{id}/invoice        — invoice / billing document
+|   GET    /api/orders/{id}/invoice        — invoice / billing document (JSON)
+|   GET    /api/orders/{id}/invoice/pdf    — invoice PDF (inline; ?download=1 to download)
+|   GET    /api/orders/{id}/invoice/link   — temporary signed link to the PDF (no token needed)
 |
 | Delivery addresses (a customer can keep many; one is the default)
 |   GET    /api/addresses                  — my addresses, default first
@@ -157,6 +165,8 @@ Route::middleware(['auth:sanctum', 'shop.approved'])->group(function () {
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
     Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
+    Route::get('/orders/{id}/invoice/pdf', [OrderController::class, 'invoicePdf']);
+    Route::get('/orders/{id}/invoice/link', [OrderController::class, 'invoiceLink']);
 
     // Delivery addresses — /default MUST stay above /{id}
     Route::get('/addresses', [DeliveryAddressController::class, 'index']);

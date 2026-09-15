@@ -12,9 +12,11 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Shop;
 use App\Services\BillingService;
+use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use App\Support\StoreContext;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 
 /**
  * Orders are placed per store: one store cart becomes one order, so billing,
@@ -22,8 +24,10 @@ use Illuminate\Support\Facades\DB;
  */
 class OrderController extends Controller
 {
-    public function __construct(private BillingService $billing)
-    {
+    public function __construct(
+        private BillingService $billing,
+        private InvoiceService $invoices,
+    ) {
     }
 
     /**
@@ -331,22 +335,7 @@ class OrderController extends Controller
             return response()->json(['status' => false, 'message' => 'Order not found.'], 404);
         }
 
-        $gstBreakup = [];
-        foreach ($order->items as $item) {
-            if ((float) $item->gst_amount <= 0) {
-                continue;
-            }
-            $slab = number_format((float) $item->gst_percentage, 2, '.', '');
-            $gstBreakup[$slab] ??= ['gst_percentage' => (float) $slab, 'taxable_amount' => 0.0, 'gst_amount' => 0.0];
-            $gstBreakup[$slab]['taxable_amount'] += (float) $item->taxable_amount;
-            $gstBreakup[$slab]['gst_amount']     += (float) $item->gst_amount;
-        }
-
-        $gstBreakup = array_values(array_map(fn($r) => [
-            'gst_percentage' => $r['gst_percentage'],
-            'taxable_amount' => round($r['taxable_amount'], 2),
-            'gst_amount'     => round($r['gst_amount'], 2),
-        ], $gstBreakup));
+        $gstBreakup = $this->invoices->gstBreakup($order);
 
         return response()->json([
             'status' => true,
@@ -373,7 +362,105 @@ class OrderController extends Controller
         ]);
     }
 
+    /**
+     * GET /api/orders/{id}/invoice/pdf           — open in app (inline)
+     * GET /api/orders/{id}/invoice/pdf?download=1 — force download
+     */
+    public function invoicePdf(Request $request, string $id)
+    {
+        if ($missing = $this->pdfEngineMissing()) {
+            return $missing;
+        }
+
+        $order = $this->findUserOrder($request, $id);
+
+        if (!$order) {
+            return response()->json(['status' => false, 'message' => 'Order not found.'], 404);
+        }
+
+        return $this->pdfResponse($order, $request->boolean('download'));
+    }
+
+    /**
+     * GET /api/orders/{id}/invoice/link
+     *
+     * A temporary signed URL that opens the PDF without a login token — for
+     * opening in an external browser or sharing as a link. Expires after
+     * config('invoice.link_ttl_minutes').
+     */
+    public function invoiceLink(Request $request, string $id)
+    {
+        $order = $this->findUserOrder($request, $id);
+
+        if (!$order) {
+            return response()->json(['status' => false, 'message' => 'Order not found.'], 404);
+        }
+
+        $ttl       = max(1, (int) config('invoice.link_ttl_minutes', 30));
+        $expiresAt = now()->addMinutes($ttl);
+
+        return response()->json([
+            'status' => true,
+            'data'   => [
+                'url'          => URL::temporarySignedRoute('invoices.signed-pdf', $expiresAt, ['id' => $order->id]),
+                'download_url' => URL::temporarySignedRoute('invoices.signed-pdf', $expiresAt, ['id' => $order->id, 'download' => 1]),
+                'filename'     => $this->invoices->filename($order),
+                'expires_at'   => $expiresAt->toDateTimeString(),
+                'expires_in'   => $ttl * 60,
+            ],
+        ]);
+    }
+
+    /**
+     * GET /api/invoices/{id}/pdf?expires=..&signature=..
+     *
+     * No login here: the `signed` middleware has already verified the URL was
+     * issued by invoiceLink() for exactly this order id and hasn't expired.
+     */
+    public function signedInvoicePdf(Request $request, string $id)
+    {
+        if ($missing = $this->pdfEngineMissing()) {
+            return $missing;
+        }
+
+        $order = Order::with(['items', 'store', 'shop'])->find($id);
+
+        if (!$order) {
+            return response()->json(['status' => false, 'message' => 'Order not found.'], 404);
+        }
+
+        return $this->pdfResponse($order, $request->boolean('download'));
+    }
+
     // ── Internals ─────────────────────────────────────────────────────────────
+
+    private function pdfResponse(Order $order, bool $download)
+    {
+        $pdf      = $this->invoices->pdf($order);
+        $filename = $this->invoices->filename($order);
+
+        return response($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => ($download ? 'attachment' : 'inline') . '; filename="' . $filename . '"',
+            'Cache-Control'       => 'private, no-store',
+        ]);
+    }
+
+    /**
+     * vendor/ is not in git. If the server was deployed without running
+     * composer install, fail this one endpoint clearly instead of a 500.
+     */
+    private function pdfEngineMissing()
+    {
+        if (class_exists(\Barryvdh\DomPDF\ServiceProvider::class) && app()->bound('dompdf.wrapper')) {
+            return null;
+        }
+
+        return response()->json([
+            'status'  => false,
+            'message' => 'Invoice PDF is not available on this server yet (PDF library missing).',
+        ], 503);
+    }
 
     /** Abort the transaction with a JSON error response. */
     private function fail(string $message, int $code): void
