@@ -128,7 +128,7 @@ class OrderController extends Controller
                         $this->fail('"' . ($item->product->name ?? 'A product') . '" is no longer available. Please remove it from your cart.', 422);
                     }
 
-                    if ((int) $product->stock < (int) $item->quantity) {
+                    if (config('cart.enforce_stock', true) && (int) $product->stock < (int) $item->quantity) {
                         $this->fail(
                             (int) $product->stock > 0
                                 ? 'Only ' . $product->stock . ' unit(s) of "' . $product->name . '" left in stock.'

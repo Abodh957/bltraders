@@ -78,7 +78,7 @@ class CartController extends Controller
 
         $user     = $request->user();
         $quantity = (int) ($request->quantity ?? 1);
-        $maxQty   = (int) config('cart.max_quantity_per_item', 99);
+        $maxQty   = (int) config('cart.max_quantity_per_item', 0);
 
         $product = Product::with('colors')->find($request->product_id);
 
@@ -120,9 +120,11 @@ class CartController extends Controller
                     ? $item->quantity + $quantity
                     : $quantity;
 
-                $newQty = min($newQty, $maxQty);
+                if ($maxQty > 0) {
+                    $newQty = min($newQty, $maxQty);
+                }
 
-                if ($newQty > (int) $product->stock) {
+                if (config('cart.enforce_stock', true) && $newQty > (int) $product->stock) {
                     abort(response()->json([
                         'status'          => false,
                         'message'         => (int) $product->stock > 0
@@ -187,8 +189,8 @@ class CartController extends Controller
             ]);
         }
 
-        $maxQty = (int) config('cart.max_quantity_per_item', 99);
-        if ($quantity > $maxQty) {
+        $maxQty = (int) config('cart.max_quantity_per_item', 0);
+        if ($maxQty > 0 && $quantity > $maxQty) {
             return response()->json([
                 'status'  => false,
                 'message' => 'You can order a maximum of ' . $maxQty . ' unit(s) of one item.',
@@ -200,7 +202,7 @@ class CartController extends Controller
             return response()->json(['status' => false, 'message' => 'This product is no longer available.'], 422);
         }
 
-        if ($quantity > (int) $product->stock) {
+        if (config('cart.enforce_stock', true) && $quantity > (int) $product->stock) {
             return response()->json([
                 'status'          => false,
                 'message'         => (int) $product->stock > 0
@@ -370,7 +372,12 @@ class CartController extends Controller
             $stock       = (int) $product->stock;
             $inStock     = $stock > 0;
             $enoughStock = $stock >= $item->quantity;
-            $isBillable  = $available && $inStock && $enoughStock;
+            $enforce     = (bool) config('cart.enforce_stock', true);
+
+            // With stock enforcement off, only the product being gone can block
+            // checkout — short stock just means it ships as a backorder.
+            $isBillable  = $available && ($enforce ? ($inStock && $enoughStock) : true);
+            $isBackorder = !$enforce && !$enoughStock;
 
             $line = $this->billing->calculateLine($product, (int) $item->quantity);
 
@@ -402,6 +409,7 @@ class CartController extends Controller
                 'line_total'      => $line['line_total'],
                 'available_stock' => $stock,
                 'is_available'    => $isBillable,
+                'is_backorder'    => $isBackorder,
                 'unavailable_reason' => $isBillable ? null : (
                     !$available ? 'Product is no longer available.'
                         : (!$inStock ? 'Out of stock.' : 'Only ' . $stock . ' unit(s) left in stock.')
