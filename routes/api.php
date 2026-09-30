@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\ShopController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\ProductController;
@@ -22,6 +23,10 @@ Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/add-shop', [AuthController::class, 'addShop']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Logged-in customer's own shop
+    Route::get('/shop', [ShopController::class, 'show']);
+    Route::post('/shop/update', [ShopController::class, 'update']);
 });
 
 // Banner API (public)
@@ -38,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Brand API (public)
 Route::get('/brands', [BrandController::class, 'index']);
+Route::get('/brands/{id}/products', [BrandController::class, 'products']);
 Route::get('/brands/{id}', [BrandController::class, 'show']);
 
 // Brand API (protected)

@@ -40,6 +40,10 @@ class ProductController extends Controller
             $query->where('sub_category_id', $request->sub_category_id);
         }
 
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
+        }
+
         if ($request->filled('featured')) {
             $query->where('is_featured', 1);
         }

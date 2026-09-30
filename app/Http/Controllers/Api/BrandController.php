@@ -28,6 +28,25 @@ class BrandController extends Controller
         return response()->json(['status' => true, 'data' => $brands]);
     }
 
+    /**
+     * GET /api/brands/{id}/products
+     *
+     * Same payload and filters as /api/products (pagination included) — this
+     * just pins brand_id, so the store context and every other filter still work.
+     */
+    public function products(Request $request, string $id)
+    {
+        $brand = Brand::where('status', 1)->find($id);
+
+        if (!$brand) {
+            return response()->json(['status' => false, 'message' => 'Brand not found'], 404);
+        }
+
+        $request->merge(['brand_id' => $brand->id]);
+
+        return app(ProductController::class)->index($request);
+    }
+
     public function show(string $id)
     {
         $brand = Brand::find($id);
