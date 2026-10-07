@@ -80,6 +80,18 @@
                         </a>
                     </li>
                 @endcan
+                <li class="nxl-item nxl-hasmenu {{ request()->is('admin/support-contacts*') ? 'active' : '' }}">
+                    <a href="{{ route('support-contacts.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather feather-phone-call"></i></span>
+                        <span class="nxl-mtext">Support Contacts</span>
+                    </a>
+                </li>
+                <li class="nxl-item nxl-hasmenu {{ request()->is('admin/pages*') ? 'active' : '' }}">
+                    <a href="{{ route('pages.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather feather-file-text"></i></span>
+                        <span class="nxl-mtext">Pages</span>
+                    </a>
+                </li>
                 <li class="nxl-item nxl-hasmenu {{ request()->is('admin/banners*') ? 'active' : '' }}">
                     <a href="{{ route('banners.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-image"></i></span>

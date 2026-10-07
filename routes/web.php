@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ColorController;
+use App\Http\Controllers\Admin\SupportContactController;
+use App\Http\Controllers\Admin\PageController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -82,6 +84,16 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('user-shops', ShopController::class);
     Route::post('user-shops/data', [ShopController::class, 'getData'])->name('user-shops.data');
     Route::post('user-shops/statusChange', [ShopController::class, 'statusChange'])->name('user-shops.statusChange');
+
+    //Pages (terms, privacy policy, ...)
+    Route::resource('pages', PageController::class)->except(['show']);
+    Route::post('pages/data', [PageController::class, 'getData'])->name('pages.data');
+    Route::post('pages/statusChange', [PageController::class, 'statusChange'])->name('pages.statusChange');
+
+    //Support contacts
+    Route::resource('support-contacts', SupportContactController::class)->except(['show']);
+    Route::post('support-contacts/data', [SupportContactController::class, 'getData'])->name('support-contacts.data');
+    Route::post('support-contacts/statusChange', [SupportContactController::class, 'statusChange'])->name('support-contacts.statusChange');
 
     //Banners
     Route::resource('banners', BannerController::class);

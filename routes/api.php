@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\ShopController;
+use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\SupportContactController;
+use App\Http\Controllers\Api\PageController as ApiPageController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\ProductController;
@@ -27,7 +30,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // Logged-in customer's own shop
     Route::get('/shop', [ShopController::class, 'show']);
     Route::post('/shop/update', [ShopController::class, 'update']);
+
+    // Delete my account (soft delete)
+    Route::post('/account/delete', [AccountController::class, 'destroy']);
 });
+
+// Static pages (public) — terms-and-conditions, privacy-policy, ...
+Route::get('/pages', [ApiPageController::class, 'index']);
+Route::get('/pages/{slug}', [ApiPageController::class, 'show']);
+
+// Support contacts (public, paginated)
+Route::get('/support-contacts', [SupportContactController::class, 'index']);
 
 // Banner API (public)
 Route::get('/banners', [BannerController::class, 'index']);
