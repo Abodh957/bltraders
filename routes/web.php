@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ColorController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\SupportContactController;
 use App\Http\Controllers\Admin\PageController;
 
@@ -84,6 +85,14 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('user-shops', ShopController::class);
     Route::post('user-shops/data', [ShopController::class, 'getData'])->name('user-shops.data');
     Route::post('user-shops/statusChange', [ShopController::class, 'statusChange'])->name('user-shops.statusChange');
+
+    //Orders
+    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('orders/data', [OrderController::class, 'getData'])->name('orders.data');
+    Route::post('orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::post('orders/{id}/payment', [OrderController::class, 'updatePayment'])->name('orders.updatePayment');
+    Route::post('orders/{id}/item', [OrderController::class, 'updateItem'])->name('orders.updateItem');
 
     //Pages (terms, privacy policy, ...)
     Route::resource('pages', PageController::class)->except(['show']);

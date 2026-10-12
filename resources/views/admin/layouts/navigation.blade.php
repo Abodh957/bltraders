@@ -80,6 +80,12 @@
                         </a>
                     </li>
                 @endcan
+                <li class="nxl-item nxl-hasmenu {{ request()->is('admin/orders*') ? 'active' : '' }}">
+                    <a href="{{ route('orders.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather feather-shopping-cart"></i></span>
+                        <span class="nxl-mtext">Order Management</span>
+                    </a>
+                </li>
                 <li class="nxl-item nxl-hasmenu {{ request()->is('admin/support-contacts*') ? 'active' : '' }}">
                     <a href="{{ route('support-contacts.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather feather-phone-call"></i></span>

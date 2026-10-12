@@ -523,6 +523,8 @@ class OrderController extends Controller
             'tax_amount'      => (float) $order->tax_amount,
             'shipping_charge' => (float) $order->shipping_charge,
             'total_amount'    => (float) $order->total_amount,
+            'paid_amount'     => (float) $order->paid_amount,
+            'due_amount'      => $order->dueAmount(),
         ];
     }
 
