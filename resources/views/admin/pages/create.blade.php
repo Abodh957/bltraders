@@ -43,7 +43,7 @@
                                         <input type="text" name="slug" value="{{ old('slug') }}" 
                                             class="form-control @error('slug') is-invalid @enderror"
                                             placeholder="auto from title" />
-                                        <small class="text-muted">Khaali chhodo to title se ban jayega.</small>
+                                        <small class="text-muted">Leave blank to generate it from the title.</small>
                                         @error('slug')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 

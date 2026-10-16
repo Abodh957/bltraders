@@ -43,7 +43,7 @@
                                         <input type="text" name="slug" value="{{ old('slug', $page->slug) }}" @if($page->isProtected()) readonly @endif
                                             class="form-control @error('slug') is-invalid @enderror"
                                             placeholder="auto from title" />
-                                        @if($page->isProtected())<small class="text-muted">Ye default page hai — slug nahi badal sakta.</small>@endif
+                                        @if($page->isProtected())<small class="text-muted">This is a default page — its slug cannot be changed.</small>@endif
                                         @error('slug')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 

@@ -50,7 +50,7 @@
                                         <input type="number" name="sort_order" min="0"
                                             value="{{ old('sort_order', $c->sort_order ?? 0) }}"
                                             class="form-control @error('sort_order') is-invalid @enderror" />
-                                        <small class="text-muted">Chhota number pehle dikhega.</small>
+                                        <small class="text-muted">Lower numbers appear first.</small>
                                         @error('sort_order')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 

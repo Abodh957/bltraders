@@ -4,6 +4,18 @@
     // Small helper so a 0-total never divides by zero.
     $pct = fn($part, $total) => $total > 0 ? round($part / $total * 100) : 0;
 @endphp
+<style>
+    /* Stat cards: a long amount must shrink inside the card instead of
+       pushing the three-dot menu past the card edge. */
+    .stat-head { gap: .5rem; }
+    .stat-head > a { flex-shrink: 0; }
+    .stat-left { min-width: 0; flex: 1 1 auto; }
+    .stat-left > .avatar-text { flex-shrink: 0; }
+    .stat-left > div:last-child { min-width: 0; }
+    .stat-head .fs-4 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Revenue can run long — let it scale down before it ever truncates. */
+    .stat-amount { font-size: clamp(15px, 1.35vw, 22px) !important; line-height: 1.3; }
+</style>
 <!--! ================================================================ !-->
 <!--! [Start] Main Content !-->
 <!--! ================================================================ !-->
@@ -45,8 +57,8 @@
                 <div class="col-xxl-3 col-md-6">
                     <div class="card stretch stretch-full">
                         <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between mb-4">
-                                <div class="d-flex gap-4 align-items-center">
+                            <div class="d-flex align-items-start justify-content-between mb-4 stat-head">
+                                <div class="d-flex gap-3 align-items-center stat-left">
                                     <div class="avatar-text avatar-lg bg-gray-200">
                                         <i class="feather-users"></i>
                                     </div>
@@ -79,8 +91,8 @@
                 <div class="col-xxl-3 col-md-6">
                     <div class="card stretch stretch-full">
                         <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between mb-4">
-                                <div class="d-flex gap-4 align-items-center">
+                            <div class="d-flex align-items-start justify-content-between mb-4 stat-head">
+                                <div class="d-flex gap-3 align-items-center stat-left">
                                     <div class="avatar-text avatar-lg bg-gray-200">
                                         <i class="feather-shopping-cart"></i>
                                     </div>
@@ -113,13 +125,13 @@
                 <div class="col-xxl-3 col-md-6">
                     <div class="card stretch stretch-full">
                         <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between mb-4">
-                                <div class="d-flex gap-4 align-items-center">
+                            <div class="d-flex align-items-start justify-content-between mb-4 stat-head">
+                                <div class="d-flex gap-3 align-items-center stat-left">
                                     <div class="avatar-text avatar-lg bg-gray-200">
                                         <i class="feather-trending-up"></i>
                                     </div>
                                     <div>
-                                        <div class="fs-4 fw-bold text-dark">₹{{ number_format($orders['revenue'], 2) }}</div>
+                                        <div class="fs-4 fw-bold text-dark stat-amount" title="₹{{ number_format($orders['revenue'], 2) }}">₹{{ number_format($orders['revenue'], 2) }}</div>
                                         <h3 class="fs-13 fw-semibold text-truncate-1-line">Total Revenue</h3>
                                     </div>
                                 </div>
@@ -148,8 +160,8 @@
                 <div class="col-xxl-3 col-md-6">
                     <div class="card stretch stretch-full">
                         <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between mb-4">
-                                <div class="d-flex gap-4 align-items-center">
+                            <div class="d-flex align-items-start justify-content-between mb-4 stat-head">
+                                <div class="d-flex gap-3 align-items-center stat-left">
                                     <div class="avatar-text avatar-lg bg-gray-200">
                                         <i class="feather-package"></i>
                                     </div>

@@ -121,9 +121,9 @@
                                         <button class="btn btn-primary w-100" id="statusBtn">Update</button>
                                     </div>
                                 </div>
-                                <p class="fs-11 text-muted mb-0 mt-2">Cancel karne par stock apne aap wapas jud jayega.</p>
+                                <p class="fs-11 text-muted mb-0 mt-2">Cancelling an order returns its stock automatically.</p>
                             @else
-                                <p class="text-muted mb-0">Ye order <b>{{ $order->status }}</b> hai — iske aage koi status nahi hai.</p>
+                                <p class="text-muted mb-0">This order is <b>{{ $order->status }}</b> — there is no next status.</p>
                             @endif
 
                             <hr>
@@ -147,7 +147,7 @@
                                 <div class="col-lg-4">
                                     <label class="form-label">Payment status</label>
                                     <select id="payStatus" class="form-control">
-                                        <option value="">Auto (amount se)</option>
+                                        <option value="">Auto (from amount)</option>
                                         @foreach(\App\Models\Order::PAYMENT_STATUSES as $s)
                                             <option value="{{ $s }}" {{ $order->payment_status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
                                         @endforeach
@@ -287,7 +287,7 @@
 
             $('#statusBtn').on('click', function () {
                 var status = $('#newStatus').val();
-                if (!confirm('Order status "' + status + '" karna hai?')) return;
+                if (!confirm('Change the order status to "' + status + '"?')) return;
                 $.post('{{ url("admin/orders") }}/' + orderId + '/status',
                     { status: status, note: $('#statusNote').val() })
                     .done(function (res) { toast('success', res.message); setTimeout(function(){ location.reload(); }, 900); })
@@ -323,13 +323,13 @@
             $(document).on('click', '.qty-save', function () {
                 var row = $(this).closest('tr');
                 var qty = parseInt(row.find('.qty-input').val(), 10);
-                if (!qty || qty < 1) { toast('error', 'Quantity 1 ya usse zyada honi chahiye.'); return; }
+                if (!qty || qty < 1) { toast('error', 'Quantity must be 1 or more.'); return; }
                 saveQty(row, qty);
             });
 
             $(document).on('click', '.item-remove', function () {
                 var row = $(this).closest('tr');
-                if (!confirm('Is item ko order se hata dein?')) return;
+                if (!confirm('Remove this item from the order?')) return;
                 saveQty(row, 0);
             });
         });
